@@ -1316,3 +1316,596 @@ JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource:
 te	INFO	Listening on port 52089
 [GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
 JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: resource://gre/modules/LoginManagerParent.jsm, line 77: TypeError: this._recipeManager is null
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: resource://gre/modules/LoginManagerParent.jsm, line 77: TypeError: this._recipeManager is null
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: resource://gre/modules/LoginManagerParent.jsm, line 77: TypeError: this._recipeManager is null
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: resource://gre/modules/LoginManagerParent.jsm, line 77: TypeError: this._recipeManager is null
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: resource://gre/modules/LoginManagerParent.jsm, line 77: TypeError: this._recipeManager is null
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: resource://gre/modules/LoginManagerParent.jsm, line 77: TypeError: this._recipeManager is null
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: resource://gre/modules/LoginManagerParent.jsm, line 77: TypeError: this._recipeManager is null
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+1480430248357	geckodriver	INFO	Listening on 127.0.0.1:55037
+1480430250370	mozprofile::profile	INFO	Using profile path C:\Users\josko\AppData\Local\Temp\rust_mozprofile.bK9B2wRBvXxM
+1480430250381	geckodriver::marionette	INFO	Starting browser C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+1480430250398	geckodriver::marionette	INFO	Connecting to Marionette on localhost:55044
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480430251053	Marionette	INFO	Listening on port 55044
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: resource://gre/modules/LoginManagerParent.jsm, line 77: TypeError: this._recipeManager is null
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: resource://gre/modules/LoginManagerParent.jsm, line 77: TypeError: this._recipeManager is null
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: resource://gre/modules/LoginManagerParent.jsm, line 77: TypeError: this._recipeManager is null
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: resource://gre/modules/LoginManagerParent.jsm, line 77: TypeError: this._recipeManager is null
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+1480431524186	geckodriver	INFO	Listening on 127.0.0.1:55251
+1480431526215	mozprofile::profile	INFO	Using profile path C:\Users\josko\AppData\Local\Temp\rust_mozprofile.nVz4ArGAgj8b
+1480431526225	geckodriver::marionette	INFO	Starting browser C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+1480431526234	geckodriver::marionette	INFO	Connecting to Marionette on localhost:55257
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480431526867	Marionette	INFO	Listening on port 55257
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1480431976335	geckodriver	INFO	Listening on 127.0.0.1:55403
+1480431978363	mozprofile::profile	INFO	Using profile path C:\Users\josko\AppData\Local\Temp\rust_mozprofile.ReyIMm8qBaSV
+1480431978374	geckodriver::marionette	INFO	Starting browser C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+1480431978383	geckodriver::marionette	INFO	Connecting to Marionette on localhost:55409
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480431979002	Marionette	INFO	Listening on port 55409
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1480432365200	geckodriver	INFO	Listening on 127.0.0.1:55603
+1480432367218	mozprofile::profile	INFO	Using profile path C:\Users\josko\AppData\Local\Temp\rust_mozprofile.3FTkAflJH2jS
+1480432367221	geckodriver::marionette	INFO	Starting browser C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+1480432367227	geckodriver::marionette	INFO	Connecting to Marionette on localhost:55609
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480432367841	Marionette	INFO	Listening on port 55609
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+[Child 10208] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 10208] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+onnecting to Marionette on localhost:55762
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480432662412	Marionette	INFO	Listening on port 55762
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+[Child 11408] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 11408] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1480432812558	geckodriver	INFO	Listening on 127.0.0.1:55917
+1480432814579	mozprofile::profile	INFO	Using profile path C:\Users\josko\AppData\Local\Temp\rust_mozprofile.Yo8ysXgHm64C
+1480432814593	geckodriver::marionette	INFO	Starting browser C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+1480432814613	geckodriver::marionette	INFO	Connecting to Marionette on localhost:55923
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480432815266	Marionette	INFO	Listening on port 55923
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1480433902426	geckodriver	INFO	Listening on 127.0.0.1:56114
+1480433904466	mozprofile::profile	INFO	Using profile path C:\Users\josko\AppData\Local\Temp\rust_mozprofile.Qjrk5NcDQhk1
+1480433904483	geckodriver::marionette	INFO	Starting browser C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+1480433904508	geckodriver::marionette	INFO	Connecting to Marionette on localhost:56120
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480433905163	Marionette	INFO	Listening on port 56120
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+*************************
+A coding exception was thrown and uncaught in a Task.
+
+Full message: TypeError: can't convert undefined to object
+Full stack: this.FinderIterator._yieldPreviousResult<@resource://gre/modules/FinderIterator.jsm:277:21
+TaskImpl_run@resource://gre/modules/Task.jsm:319:40
+
+*************************
+*************************
+A coding exception was thrown and uncaught in a Task.
+
+Full message: TypeError: can't convert undefined to object
+Full stack: this.FinderIterator._yieldPreviousResult<@resource://gre/modules/FinderIterator.jsm:277:21
+TaskImpl_run@resource://gre/modules/Task.jsm:319:40
+
+*************************
+*************************
+A coding exception was thrown and uncaught in a Task.
+
+Full message: TypeError: can't convert undefined to object
+Full stack: this.FinderIterator._yieldPreviousResult<@resource://gre/modules/FinderIterator.jsm:277:21
+TaskImpl_run@resource://gre/modules/Task.jsm:319:40
+
+*************************
+*************************
+A coding exception was thrown and uncaught in a Task.
+
+Full message: TypeError: can't convert undefined to object
+Full stack: this.FinderIterator._yieldPreviousResult<@resource://gre/modules/FinderIterator.jsm:277:21
+TaskImpl_run@resource://gre/modules/Task.jsm:319:40
+
+*************************
+*************************
+A coding exception was thrown and uncaught in a Task.
+
+Full message: TypeError: can't convert undefined to object
+Full stack: this.FinderIterator._yieldPreviousResult<@resource://gre/modules/FinderIterator.jsm:277:21
+TaskImpl_run@resource://gre/modules/Task.jsm:319:40
+
+*************************
+*************************
+A coding exception was thrown and uncaught in a Task.
+
+Full message: TypeError: can't convert undefined to object
+Full stack: this.FinderIterator._yieldPreviousResult<@resource://gre/modules/FinderIterator.jsm:277:21
+TaskImpl_run@resource://gre/modules/Task.jsm:319:40
+
+*************************
+*************************
+A coding exception was thrown and uncaught in a Task.
+
+Full message: TypeError: can't convert undefined to object
+Full stack: this.FinderIterator._yieldPreviousResult<@resource://gre/modules/FinderIterator.jsm:277:21
+TaskImpl_run@resource://gre/modules/Task.jsm:319:40
+
+*************************
+*************************
+A coding exception was thrown and uncaught in a Task.
+
+Full message: TypeError: can't convert undefined to object
+Full stack: this.FinderIterator._yieldPreviousResult<@resource://gre/modules/FinderIterator.jsm:277:21
+TaskImpl_run@resource://gre/modules/Task.jsm:319:40
+
+*************************
+*************************
+A coding exception was thrown and uncaught in a Task.
+
+Full message: TypeError: can't convert undefined to object
+Full stack: this.FinderIterator._yieldPreviousResult<@resource://gre/modules/FinderIterator.jsm:277:21
+TaskImpl_run@resource://gre/modules/Task.jsm:319:40
+
+*************************
+*************************
+A coding exception was thrown and uncaught in a Task.
+
+Full message: TypeError: can't convert undefined to object
+Full stack: this.FinderIterator._yieldPreviousResult<@resource://gre/modules/FinderIterator.jsm:277:21
+TaskImpl_run@resource://gre/modules/Task.jsm:319:40
+
+*************************
+*************************
+A coding exception was thrown and uncaught in a Task.
+
+Full message: TypeError: can't convert undefined to object
+Full stack: this.FinderIterator._yieldPreviousResult<@resource://gre/modules/FinderIterator.jsm:277:21
+TaskImpl_run@resource://gre/modules/Task.jsm:319:40
+
+*************************
+*************************
+A coding exception was thrown and uncaught in a Task.
+
+Full message: TypeError: can't convert undefined to object
+Full stack: this.FinderIterator._yieldPreviousResult<@resource://gre/modules/FinderIterator.jsm:277:21
+TaskImpl_run@resource://gre/modules/Task.jsm:319:40
+
+*************************
+*************************
+A coding exception was thrown and uncaught in a Task.
+
+Full message: TypeError: can't convert undefined to object
+Full stack: this.FinderIterator._yieldPreviousResult<@resource://gre/modules/FinderIterator.jsm:277:21
+TaskImpl_run@resource://gre/modules/Task.jsm:319:40
+
+*************************
+*************************
+A coding exception was thrown and uncaught in a Task.
+
+Full message: TypeError: can't convert undefined to object
+Full stack: this.FinderIterator._yieldPreviousResult<@resource://gre/modules/FinderIterator.jsm:277:21
+TaskImpl_run@resource://gre/modules/Task.jsm:319:40
+
+*************************
+*************************
+A coding exception was thrown and uncaught in a Task.
+
+Full message: TypeError: can't convert undefined to object
+Full stack: this.FinderIterator._yieldPreviousResult<@resource://gre/modules/FinderIterator.jsm:277:21
+TaskImpl_run@resource://gre/modules/Task.jsm:319:40
+
+*************************
+*************************
+A coding exception was thrown and uncaught in a Task.
+
+Full message: TypeError: can't convert undefined to object
+Full stack: this.FinderIterator._yieldPreviousResult<@resource://gre/modules/FinderIterator.jsm:277:21
+TaskImpl_run@resource://gre/modules/Task.jsm:319:40
+
+*************************
+*************************
+A coding exception was thrown and uncaught in a Task.
+
+Full message: TypeError: can't convert undefined to object
+Full stack: this.FinderIterator._yieldPreviousResult<@resource://gre/modules/FinderIterator.jsm:277:21
+TaskImpl_run@resource://gre/modules/Task.jsm:319:40
+
+*************************
+*************************
+A coding exception was thrown and uncaught in a Task.
+
+Full message: TypeError: can't convert undefined to object
+Full stack: this.FinderIterator._yieldPreviousResult<@resource://gre/modules/FinderIterator.jsm:277:21
+TaskImpl_run@resource://gre/modules/Task.jsm:319:40
+
+*************************
+*************************
+A coding exception was thrown and uncaught in a Task.
+
+Full message: TypeError: can't convert undefined to object
+Full stack: this.FinderIterator._yieldPreviousResult<@resource://gre/modules/FinderIterator.jsm:277:21
+TaskImpl_run@resource://gre/modules/Task.jsm:319:40
+
+*************************
+*************************
+A coding exception was thrown and uncaught in a Task.
+
+Full message: TypeError: can't convert undefined to object
+Full stack: this.FinderIterator._yieldPreviousResult<@resource://gre/modules/FinderIterator.jsm:277:21
+TaskImpl_run@resource://gre/modules/Task.jsm:319:40
+
+*************************
+*************************
+A coding exception was thrown and uncaught in a Task.
+
+Full message: TypeError: can't convert undefined to object
+Full stack: this.FinderIterator._yieldPreviousResult<@resource://gre/modules/FinderIterator.jsm:277:21
+TaskImpl_run@resource://gre/modules/Task.jsm:319:40
+
+*************************
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: resource://gre/modules/LoginManagerParent.jsm, line 77: TypeError: this._recipeManager is null
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: resource://gre/modules/LoginManagerParent.jsm, line 77: TypeError: this._recipeManager is null
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: resource://gre/modules/LoginManagerParent.jsm, line 77: TypeError: this._recipeManager is null
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: resource://gre/modules/LoginManagerParent.jsm, line 77: TypeError: this._recipeManager is null
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: resource://gre/modules/LoginManagerParent.jsm, line 77: TypeError: this._recipeManager is null
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: resource://gre/modules/LoginManagerParent.jsm, line 77: TypeError: this._recipeManager is null
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: resource://gre/modules/LoginManagerParent.jsm, line 77: TypeError: this._recipeManager is null
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: resource://gre/modules/LoginManagerParent.jsm, line 77: TypeError: this._recipeManager is null
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: resource://gre/modules/LoginManagerParent.jsm, line 77: TypeError: this._recipeManager is null
+1480438666772	geckodriver	INFO	Listening on 127.0.0.1:56545
+1480438668804	mozprofile::profile	INFO	Using profile path C:\Users\josko\AppData\Local\Temp\rust_mozprofile.ZVbVmmzmXWsl
+1480438668820	geckodriver::marionette	INFO	Starting browser C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+1480438668841	geckodriver::marionette	INFO	Connecting to Marionette on localhost:56552
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480438669511	Marionette	INFO	Listening on port 56552
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+[Child 8376] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+.Sqypvxpc8lZX
+1480438808434	geckodriver::marionette	INFO	Starting browser C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+1480438808440	geckodriver::marionette	INFO	Connecting to Marionette on localhost:56713
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480438809074	Marionette	INFO	Listening on port 56713
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1480438865415	geckodriver	INFO	Listening on 127.0.0.1:56812
+1480438867425	mozprofile::profile	INFO	Using profile path C:\Users\josko\AppData\Local\Temp\rust_mozprofile.jceKUn0WV30m
+1480438867436	geckodriver::marionette	INFO	Starting browser C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+1480438867448	geckodriver::marionette	INFO	Connecting to Marionette on localhost:56818
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480438868043	Marionette	INFO	Listening on port 56818
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+[Child 11892] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 11892] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1480438935146	geckodriver	INFO	Listening on 127.0.0.1:56929
+1480438937170	mozprofile::profile	INFO	Using profile path C:\Users\josko\AppData\Local\Temp\rust_mozprofile.LvpBkQa4sveC
+1480438937173	geckodriver::marionette	INFO	Starting browser C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+1480438937179	geckodriver::marionette	INFO	Connecting to Marionette on localhost:56935
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480438937840	Marionette	INFO	Listening on port 56935
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+JavaScript error: chrome://marionette/content/listener.js, line 999: NS_ERROR_FAILURE: Component returned failure code: 0x80004005 (NS_ERROR_FAILURE) [nsIWebProgress.removeProgressListener]
+[Child 10264] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 10264] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1480439033006	geckodriver	INFO	Listening on 127.0.0.1:57085
+1480439035734	geckodriver	INFO	Listening on 127.0.0.1:57093
+1480439037754	mozprofile::profile	INFO	Using profile path C:\Users\josko\AppData\Local\Temp\rust_mozprofile.8Jp7hwqjIAhD
+1480439037766	geckodriver::marionette	INFO	Starting browser C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+1480439037776	geckodriver::marionette	INFO	Connecting to Marionette on localhost:57099
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480439038390	Marionette	INFO	Listening on port 57099
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1480439186158	geckodriver	INFO	Listening on 127.0.0.1:57195
+1480439188191	mozprofile::profile	INFO	Using profile path C:\Users\josko\AppData\Local\Temp\rust_mozprofile.hJ9tkmqoTlT0
+1480439188202	geckodriver::marionette	INFO	Starting browser C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+1480439188209	geckodriver::marionette	INFO	Connecting to Marionette on localhost:57201
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480439188842	Marionette	INFO	Listening on port 57201
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+1480439331685	geckodriver	INFO	Listening on 127.0.0.1:57298
+1480439333715	mozprofile::profile	INFO	Using profile path C:\Users\josko\AppData\Local\Temp\rust_mozprofile.dUEmnzXkqLy6
+1480439333740	geckodriver::marionette	INFO	Starting browser C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+1480439333747	geckodriver::marionette	INFO	Connecting to Marionette on localhost:57304
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480439334385	Marionette	INFO	Listening on port 57304
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+[Child 4392] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1480439414780	geckodriver	INFO	Listening on 127.0.0.1:57415
+1480439416799	mozprofile::profile	INFO	Using profile path C:\Users\josko\AppData\Local\Temp\rust_mozprofile.KlKNd5LEuGSM
+1480439416810	geckodriver::marionette	INFO	Starting browser C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+1480439416816	geckodriver::marionette	INFO	Connecting to Marionette on localhost:57422
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480439417439	Marionette	INFO	Listening on port 57422
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: resource://gre/modules/LoginManagerParent.jsm, line 77: TypeError: this._recipeManager is null
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+[Child 8208] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 8208] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1480439523641	geckodriver	INFO	Listening on 127.0.0.1:57558
+1480439525668	mozprofile::profile	INFO	Using profile path C:\Users\josko\AppData\Local\Temp\rust_mozprofile.AhWBwElgMp06
+1480439525679	geckodriver::marionette	INFO	Starting browser C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+1480439525688	geckodriver::marionette	INFO	Connecting to Marionette on localhost:57564
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480439526298	Marionette	INFO	Listening on port 57564
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+[Child 8992] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 8992] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+	Connecting to Marionette on localhost:57713
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480439733447	Marionette	INFO	Listening on port 57713
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+[Child 12980] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 12980] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+onnecting to Marionette on localhost:57828
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480439794012	Marionette	INFO	Listening on port 57828
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+[Child 12896] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 12896] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1480440424916	geckodriver	INFO	Listening on 127.0.0.1:58043
+1480440426934	mozprofile::profile	INFO	Using profile path C:\Users\josko\AppData\Local\Temp\rust_mozprofile.tZjOROYgqBqH
+1480440426949	geckodriver::marionette	INFO	Starting browser C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+1480440426960	geckodriver::marionette	INFO	Connecting to Marionette on localhost:58049
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480440427575	Marionette	INFO	Listening on port 58049
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+[Child 6072] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1480440541421	geckodriver	INFO	Listening on 127.0.0.1:58164
+1480440543450	mozprofile::profile	INFO	Using profile path C:\Users\josko\AppData\Local\Temp\rust_mozprofile.Iv3cBI4wP2gq
+1480440543461	geckodriver::marionette	INFO	Starting browser C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+1480440543469	geckodriver::marionette	INFO	Connecting to Marionette on localhost:58170
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480440544108	Marionette	INFO	Listening on port 58170
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+[Child 9316] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 9316] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+	Connecting to Marionette on localhost:58293
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480440619125	Marionette	INFO	Listening on port 58293
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1480440679021	geckodriver	INFO	Listening on 127.0.0.1:58405
+1480440681055	mozprofile::profile	INFO	Using profile path C:\Users\josko\AppData\Local\Temp\rust_mozprofile.49UP86NyrzDW
+1480440681074	geckodriver::marionette	INFO	Starting browser C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+1480440681084	geckodriver::marionette	INFO	Connecting to Marionette on localhost:58411
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480440681707	Marionette	INFO	Listening on port 58411
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+[Child 7772] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 7772] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1480440798401	geckodriver	INFO	Listening on 127.0.0.1:58554
+1480440800423	mozprofile::profile	INFO	Using profile path C:\Users\josko\AppData\Local\Temp\rust_mozprofile.fVpoqrd6m18N
+1480440800434	geckodriver::marionette	INFO	Starting browser C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+1480440800440	geckodriver::marionette	INFO	Connecting to Marionette on localhost:58560
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480440801058	Marionette	INFO	Listening on port 58560
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+[Child 1600] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 1600] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+	Connecting to Marionette on localhost:58694
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480441150224	Marionette	INFO	Listening on port 58694
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+[Child 12108] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 12108] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+onnecting to Marionette on localhost:58829
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480441265459	Marionette	INFO	Listening on port 58829
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1480441368430	geckodriver	INFO	Listening on 127.0.0.1:59016
+1480441370457	mozprofile::profile	INFO	Using profile path C:\Users\josko\AppData\Local\Temp\rust_mozprofile.rQRf5nCCrSsC
+1480441370468	geckodriver::marionette	INFO	Starting browser C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+1480441370477	geckodriver::marionette	INFO	Connecting to Marionette on localhost:59022
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480441371114	Marionette	INFO	Listening on port 59022
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1480441526610	geckodriver	INFO	Listening on 127.0.0.1:59138
+1480441528636	mozprofile::profile	INFO	Using profile path C:\Users\josko\AppData\Local\Temp\rust_mozprofile.u97rFnDNP5PY
+1480441528639	geckodriver::marionette	INFO	Starting browser C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+1480441528645	geckodriver::marionette	INFO	Connecting to Marionette on localhost:59145
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480441529273	Marionette	INFO	Listening on port 59145
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1480441716916	geckodriver	INFO	Listening on 127.0.0.1:59258
+1480441718925	mozprofile::profile	INFO	Using profile path C:\Users\josko\AppData\Local\Temp\rust_mozprofile.tKjQaki6JagD
+1480441718944	geckodriver::marionette	INFO	Starting browser C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+1480441718955	geckodriver::marionette	INFO	Connecting to Marionette on localhost:59264
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480441719585	Marionette	INFO	Listening on port 59264
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1480441860773	geckodriver	INFO	Listening on 127.0.0.1:59379
+1480441862796	mozprofile::profile	INFO	Using profile path C:\Users\josko\AppData\Local\Temp\rust_mozprofile.eaPX6AvuYdEK
+1480441862807	geckodriver::marionette	INFO	Starting browser C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+1480441862813	geckodriver::marionette	INFO	Connecting to Marionette on localhost:59385
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480441863465	Marionette	INFO	Listening on port 59385
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+[Child 11684] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+gBd0rfXKX2N7
+1480441975802	geckodriver::marionette	INFO	Starting browser C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+1480441975819	geckodriver::marionette	INFO	Connecting to Marionette on localhost:59529
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480441976446	Marionette	INFO	Listening on port 59529
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+JavaScript error: chrome://marionette/content/listener.js, line 999: NS_ERROR_FAILURE: Component returned failure code: 0x80004005 (NS_ERROR_FAILURE) [nsIWebProgress.removeProgressListener]
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: resource://gre/modules/LoginManagerParent.jsm, line 77: TypeError: this._recipeManager is null
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: resource://gre/modules/LoginManagerParent.jsm, line 77: TypeError: this._recipeManager is null
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+[Child 12184] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel] Error: (msgtype=0x4A00C2,name=PContent::Msg_ConsoleMessage) Channel closing: too late to send/recv, messages will be lost
+
+[Child 12184] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+odules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+[Child 12732] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 12732] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+/@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+[Child 3328] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 3328] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1480497266657	geckodriver	INFO	Listening on 127.0.0.1:60330
+1480497268671	mozprofile::profile	INFO	Using profile path C:\Users\josko\AppData\Local\Temp\rust_mozprofile.D6BDH5HwHtSB
+1480497268677	geckodriver::marionette	INFO	Starting browser C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+1480497268685	geckodriver::marionette	INFO	Connecting to Marionette on localhost:60336
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480497269325	Marionette	INFO	Listening on port 60336
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+JavaScript error: https://fci.orange-business.com/frontalWeb/scripts/CalendarPopup.js, line 692: Error: Permission denied to access property "parentNode"
+JavaScript error: resource://gre/modules/LoginManagerParent.jsm, line 77: TypeError: this._recipeManager is null
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+JavaScript error: resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/client/inspector/breadcrumbs.js, line 486: TypeError: this.handleMouseLeave is not a function
+[Child 10108] WARNING: pipe error: 109: file c:/builds/moz2_1480497656540	mozprofile::profile	INFO	Using profile path C:\Users\josko\AppData\Local\Temp\rust_mozprofile.0xwzNSC9HDqw
+1480497656560	geckodriver::marionette	INFO	Starting browser C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+1480497656571	geckodriver::marionette	INFO	Connecting to Marionette on localhost:60784
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+1480497657163	Marionette	INFO	Listening on port 60784
+[GFX1]: Potential driver version mismatch ignored due to missing DLLs 0.0.0.0 and 0.0.0.0
+JavaScript warning: https://dro.orange-business.com/static/js/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
