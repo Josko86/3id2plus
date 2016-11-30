@@ -31,7 +31,7 @@ def login(browser):
 
 def boutique_operations(browser):
     # boutique operations
-    dos_type = 'SPL'
+    dos_type = 'STR'
     browser.get('https://espaceclient.orange-business.com/group/divop/boutique-operateurs')
     time.sleep(3)
     main_window_handle = browser.current_window_handle
@@ -51,6 +51,11 @@ def boutique_operations(browser):
         b = browser.find_element_by_css_selector('.sfci_box > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(1) > '
                                                  'table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(2)'
                                                  ' > select:nth-child(1) > option:nth-child(7)')
+    elif dos_type == 'STR':
+        b = browser.find_element_by_css_selector('.sfci_box > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(1)'
+                                                 ' > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(2) > '
+                                                 'td:nth-child(2) > select:nth-child(1) > option:nth-child(4)')
+
     b.click()
     c = browser.find_element_by_css_selector('.sfci_box > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(1) '
                                              '> table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(3) > td:nth-child(2)'
@@ -68,7 +73,7 @@ def boutique_operations(browser):
                 break
     browser.switch_to.window(signin_window_handle)
     client = 'SC1'
-    city = 'VAUX_PENIL'
+    city = 'COLOMBES'
     time.sleep(5)
 
     row_text = browser.find_element_by_xpath("//*[contains(text(), '" + client + '_' + city + '_' + dos_type + "')]")
@@ -230,10 +235,17 @@ def boutique_operations(browser):
 
         # Fechas de cpl y str
         time.sleep(1)
+        # Si solo arquetas se deja por defecto GC, si no se pone GC et apus aeris
+        if arquetas_postes == 'postes':
+            select_postes = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:cont_com\/gcblo\:cde_'
+                                                                 'concerne > option:nth-child(4)')
+            select_postes.click()
+
+        time.sleep(1)
         if dos_type == 'CPL':
             diferencial_tipo = 'contenu_declaration_travaux'
         elif dos_type == 'STR':
-            diferencial_tipo = 'declarator_trvx'
+            diferencial_tipo = 'declaration_trvx'
 
         form_fecha_ini = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:' + diferencial_tipo + '\/gcblo\:date_debut_trvx')
         form_fecha_fin = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:' + diferencial_tipo + '\/gcblo\:date_fin_trvx_td_input > input:nth-child(1)')
