@@ -2,12 +2,93 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 import time
+from datetime import date, timedelta
 import openpyxl
 
 
-# Carga de todos los datos necesarios del excel
+# Funciones utils
+def esAval(row, hp):
+    global aval
+    if hp.cell(row= row, column= 6).value == 'Aval PM':
+        aval = True
+    elif hp.cell(row= row, column= 6).value == 'Amont PM':
+        aval = False
+    return aval
 
 
+def calculoTipo(row, hp):
+    global tipo
+    if hp.cell(row= row, column= 18).value == 'SIMPLE':
+        tipo = 'SPL'
+    elif hp.cell(row= row, column= 18).value == 'COMPLEXE':
+        tipo = 'CPL'
+    elif hp.cell(row= row, column= 18).value == 'STRUCTURANTE':
+        tipo = 'STR'
+    return tipo
+
+
+def calculoFechas(tipo, col, hp):
+    global date
+    if tipo == 'SPL':
+        date = hp.cell(row= 1, column=col).value
+    elif tipo == 'CPL':
+        date = hp.cell(row= 2, column=col).value
+    elif tipo == 'STR':
+        date = hp.cell(row=3, column=col).value
+    date = date.strftime('%d/%m/%Y')
+    return date
+
+# Carga de todos los datos necesarios del excel y los mete en un diccionario de dosieres
+# doc = openpyxl.load_workbook('SuiviJRU.xlsx')
+# doc.save('SuiviJRU.xlsx')
+doc = openpyxl.load_workbook('SuiviJRU.xlsx', data_only=True)
+doc.get_sheet_names()
+hoja_principal = doc.get_sheet_by_name('Tab Suivi Prod')
+dosieres = dict()
+dosieres_act = ['Cly1345', 'Sus1230', 'Sus1269', 'Moe993', 'Sas780', 'Nee839']
+
+for row in hoja_principal.iter_rows(min_row=1, max_col=1, max_row=1360):
+    for celda in row:
+        if celda.value in dosieres_act:
+            pass
+            b = 2
+            dosier = {
+                'nombre': celda.value,
+                'ciudad': hoja_principal.cell(row= celda.row, column= 15).value,
+                'es_aval': esAval(celda.row, hoja_principal),
+                'tipo': calculoTipo(celda.row, hoja_principal),
+                'es_1ca': hoja_principal.cell(row= celda.row, column=17).value == '1er CA',
+                'IPE_PM': hoja_principal.cell(row= celda.row, column= 8).value,
+                'ref_1era_PM': hoja_principal.cell(row= celda.row, column= 14).value,
+                'num_EL': hoja_principal.cell(row= celda.row, column=30).value,
+                'cliente': 'SC1',
+                'solo_arquetas': True,
+                'calles': ['rue del percebe', 'calle street', 'callejon hammer'],
+                'ref_cli': ''
+            }
+            dosier['date_ini'] = calculoFechas(dosier['tipo'], 4, hoja_principal)
+            dosier['date_fin'] = calculoFechas(dosier['tipo'], 5, hoja_principal)
+            dosieres[dosier['nombre']] = dosier
+
+pass
+# dosier : {
+#     'nombre': 'Les1303'
+#     'cliente': 'SC1',
+#     'tipo': 'SPL',
+#     'ciudad': 'COLOMBES',
+#     'es_aval': True,
+#     'es_1ca': True,
+#     'solo_arquetas': True
+#     'IPE_PM': 'FI-63463-12312',
+#     'ref_1era_PM': 'F1241231233',
+#     'num_el': '34',
+#     'date_ini': '05/12/2016',
+#     'date_fin': '02/01/2016',
+#     'calles': ['rue del percebe', 'calle street'],
+#     'ref_cli': 'SC1_IMB_93045_C_00X1',
+# }
+
+pass
 
 def set_up_browser():
     # set up browser
