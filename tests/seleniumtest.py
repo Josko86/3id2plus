@@ -45,9 +45,9 @@ doc = openpyxl.load_workbook('SuiviJRU.xlsx', data_only=True)
 doc.get_sheet_names()
 hoja_principal = doc.get_sheet_by_name('Tab Suivi Prod')
 dosieres = dict()
-dosieres_act = ['Cly1345', 'Sus1230', 'Sus1269', 'Moe993', 'Sas780', 'Nee839']
+dosieres_act = ['Sus1136', 'Cly1345', 'Sus1230', 'Sus1269', 'Sus1314']
 
-for row in hoja_principal.iter_rows(min_row=1, max_col=1, max_row=1360):
+for row in hoja_principal.iter_rows(min_row=1, max_col=1, max_row=hoja_principal.max_row):
     for celda in row:
         if celda.value in dosieres_act:
             pass
@@ -110,9 +110,9 @@ def login(browser):
     time.sleep(4)
 
 
-def boutique_operations(browser):
+def boutique_operations(browser, d):
     # boutique operations
-    dos_type = 'STR'
+    dos_type = d['tipo']
     browser.get('https://espaceclient.orange-business.com/group/divop/boutique-operateurs')
     time.sleep(3)
     main_window_handle = browser.current_window_handle
@@ -153,8 +153,8 @@ def boutique_operations(browser):
                 signin_window_handle = handle
                 break
     browser.switch_to.window(signin_window_handle)
-    client = 'SC1'
-    city = 'COLOMBES'
+    client = d['cliente']
+    city = d['ciudad']
     time.sleep(5)
 
     row_text = browser.find_element_by_xpath("//*[contains(text(), '" + client + '_' + city + '_' + dos_type + "')]")
@@ -169,14 +169,14 @@ def boutique_operations(browser):
     time.sleep(1)
 
     # Volvemos a la pagina anterior y aparece un formulario en el que hay que rellenar algunos campos
-    aval_or_amont = 'aval'
-    aval_primera = False
-    aval1_info = 'F12312313123'
-    aval2_info = 'f0000123000'
-    arquetas_postes = 'postes'
-    fecha_ini = '23/11/2017'
-    fecha_fin = '21/12/2017'
-    calles = ['rue del percebe', 'calle street', 'callejon hammer']
+    es_aval = d['es_aval']
+    aval_primera = d['es_1ca']
+    ref_1era_PM = d['ref_1era_PM']
+    IPE_PM = d['IPE_PM']
+    solo_arquetas = d['solo_arquetas']
+    fecha_ini = d['date_ini']
+    fecha_fin = d['date_fin']
+    calles = d['calles']
     time.sleep(1)
     commande = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_pm_td_input '
                                                     '> select:nth-child(1)')
@@ -185,28 +185,31 @@ def boutique_operations(browser):
 
     # Para dosier Simple
     if dos_type == 'SPL':
-        if aval_or_amont == 'aval':
+        if es_aval:
             #opción marcada por defecto. No modificar el select, solo los 2 campos siguientes
 
             aval1 = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:ref_cde_aval_pm_td'
                                                          '_input > input:nth-child(1)')
             aval1.clear()
             time.sleep(1)
-            aval1.send_keys(aval1_info)
+            aval1.send_keys(ref_1era_PM)
             aval2 = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:ref_ipe_td_input '
                                                          '> input:nth-child(1)')
             aval2.clear()
-            aval2.send_keys(aval2_info)
+            aval2.send_keys(IPE_PM)
 
-        elif aval_or_amont == 'amont':
+        elif not es_aval:
+            time.sleep(1)
             amont_choice = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_'
                                                                 'pm_td_input > select:nth-child(1) > option:nth-child(2)')
             amont_choice.click()
+            browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_'
+                                                 'pm_td_input > select:nth-child(1) > option:nth-child(2)').click()
 
         time.sleep(2)
 
         # Si solo arquetas se deja por defecto GC, si no se pone GC et apus aeris
-        if arquetas_postes == 'postes':
+        if not solo_arquetas:
             select_postes = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:cont_com\/gcblo\:cde_'
                                                                    'concerne > option:nth-child(4)')
             select_postes.click()
@@ -247,30 +250,39 @@ def boutique_operations(browser):
     # e = cable mixte
     # f = FCI del primer
     if dos_type == 'CPL' or dos_type == 'STR':
-        if aval_or_amont == 'aval' and not aval_primera:
-            ipe = 'ipedelpm'
-            fci_anterior = 'F21351351341'
+        if es_aval and not aval_primera:
 
+            a = browser.find_element_by_css_selector(
+                '#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_pm_td_input > select:nth-child(1) > option:nth-child(2)')
+            a.click()
             time.sleep(1)
             b = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:ref_ipe_td_input > '
                                                      'input:nth-child(1)')
             b.clear()
-            b.send_keys(ipe)
+            b.send_keys(IPE_PM)
+            time.sleep(1)
+            c = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:type_cde_td_input'
+                                                     ' > select:nth-child(1) > option:nth-child(3)')
+            c.click()
+            time.sleep(1)
             f = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:ref_cde_aval_pm_td_input > '
                                                      'input:nth-child(1)')
             f.clear()
             time.sleep(1)
-            f.send_keys(fci_anterior)
+            f.send_keys(ref_1era_PM)
 
-        if aval_or_amont == 'aval' and aval_primera:
-            ipe = 'ipedelpm'
-            num_el = '5'
+        if es_aval and aval_primera:
 
+            num_el = d['num_EL']
+
+            a = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:'
+                                                     'zone_cde_pm_td_input > select:nth-child(1) > option:nth-child(2)')
+            a.click()
             time.sleep(1)
             b = browser.find_element_by_css_selector(
                 '#\/com\:commande\/gcblo\:contexte_com\/gcblo\:ref_ipe_td_input > input:nth-child(1)')
             b.clear()
-            b.send_keys(ipe)
+            b.send_keys(IPE_PM)
             c = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:type_cde_td_input > '
                                                      'select:nth-child(1)')
             c.click()
@@ -294,9 +306,10 @@ def boutique_operations(browser):
             f.clear()
             time.sleep(1)
 
-        if aval_or_amont == 'amont':
-            a = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_pm_td_input'
-                                                     ' > select:nth-child(1)')
+        if not es_aval:
+            time.sleep(1)
+            a = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_pm_td_'
+                                                     'input > select:nth-child(1) > option:nth-child(3)')
             a.click()
             time.sleep(1)
             a1 = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_pm_td_input'
@@ -317,7 +330,7 @@ def boutique_operations(browser):
         # Fechas de cpl y str
         time.sleep(1)
         # Si solo arquetas se deja por defecto GC, si no se pone GC et apus aeris
-        if arquetas_postes == 'postes':
+        if not solo_arquetas:
             select_postes = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:cont_com\/gcblo\:cde_'
                                                                  'concerne > option:nth-child(4)')
             select_postes.click()
@@ -352,6 +365,13 @@ def boutique_operations(browser):
 
 
 # COMIENZA EL PROCESO
-browser = set_up_browser()
-login(browser)
-boutique_operations(browser)
+
+for d in dosieres_act:
+    browser = set_up_browser()
+    login(browser)
+    boutique_operations(browser, dosieres[d])
+    time.sleep(4)
+    browser.close()
+    browser.quit()
+    time.sleep(5)
+b =2
