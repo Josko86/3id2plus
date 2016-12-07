@@ -2,8 +2,9 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 import time
-from datetime import date, timedelta
+import logging
 import openpyxl
+import os
 
 
 # Funciones utils
@@ -38,39 +39,40 @@ def calculoFechas(tipo, col, hp):
     date = date.strftime('%d/%m/%Y')
     return date
 
+def cargarDatos(dosieres_act):
 # Carga de todos los datos necesarios del excel y los mete en un diccionario de dosieres
 # doc = openpyxl.load_workbook('SuiviJRU.xlsx')
 # doc.save('SuiviJRU.xlsx')
-doc = openpyxl.load_workbook('SuiviJRU.xlsx', data_only=True)
-doc.get_sheet_names()
-hoja_principal = doc.get_sheet_by_name('Tab Suivi Prod')
-dosieres = dict()
-dosieres_act = ['Sus1136', 'Cly1345', 'Sus1230', 'Sus1269', 'Sus1314']
 
-for row in hoja_principal.iter_rows(min_row=1, max_col=1, max_row=hoja_principal.max_row):
-    for celda in row:
-        if celda.value in dosieres_act:
-            pass
-            b = 2
-            dosier = {
-                'nombre': celda.value,
-                'ciudad': hoja_principal.cell(row= celda.row, column= 15).value,
-                'es_aval': esAval(celda.row, hoja_principal),
-                'tipo': calculoTipo(celda.row, hoja_principal),
-                'es_1ca': hoja_principal.cell(row= celda.row, column=17).value == '1er CA',
-                'IPE_PM': hoja_principal.cell(row= celda.row, column= 8).value,
-                'ref_1era_PM': hoja_principal.cell(row= celda.row, column= 14).value,
-                'num_EL': hoja_principal.cell(row= celda.row, column=30).value,
-                'cliente': 'SC1',
-                'solo_arquetas': True,
-                'calles': ['rue del percebe', 'calle street', 'callejon hammer'],
-                'ref_cli': ''
-            }
-            dosier['date_ini'] = calculoFechas(dosier['tipo'], 4, hoja_principal)
-            dosier['date_fin'] = calculoFechas(dosier['tipo'], 5, hoja_principal)
-            dosieres[dosier['nombre']] = dosier
 
-pass
+    doc = openpyxl.load_workbook('SuiviJRU.xlsx', data_only=True)
+    doc.get_sheet_names()
+    hoja_principal = doc.get_sheet_by_name('Tab Suivi Prod')
+    dosieres = dict()
+
+    for row in hoja_principal.iter_rows(min_row=1, max_col=1, max_row=hoja_principal.max_row):
+        for celda in row:
+            if celda.value in dosieres_act:
+                dosier = {
+                    'nombre': celda.value,
+                    'ciudad': hoja_principal.cell(row= celda.row, column= 15).value,
+                    'es_aval': esAval(celda.row, hoja_principal),
+                    'tipo': calculoTipo(celda.row, hoja_principal),
+                    'es_1ca': hoja_principal.cell(row= celda.row, column=17).value == '1er CA',
+                    'IPE_PM': hoja_principal.cell(row= celda.row, column= 8).value,
+                    'ref_1era_PM': hoja_principal.cell(row= celda.row, column= 14).value,
+                    'num_EL': hoja_principal.cell(row= celda.row, column=30).value,
+                    'cliente': 'SC1',
+                    'solo_arquetas': True,
+                    'calles': ['rue del percebe', 'calle street', 'callejon hammer'],
+                    'ref_cli': ''
+                }
+                dosier['date_ini'] = calculoFechas(dosier['tipo'], 4, hoja_principal)
+                dosier['date_fin'] = calculoFechas(dosier['tipo'], 5, hoja_principal)
+                dosieres[dosier['nombre']] = dosier
+    return dosieres
+
+############################################ EJEMPLO DOSIER ###########################
 # dosier : {
 #     'nombre': 'Les1303'
 #     'cliente': 'SC1',
@@ -87,8 +89,7 @@ pass
 #     'calles': ['rue del percebe', 'calle street'],
 #     'ref_cli': 'SC1_IMB_93045_C_00X1',
 # }
-
-pass
+######################################################################################
 
 def set_up_browser():
     # set up browser
@@ -364,14 +365,42 @@ def boutique_operations(browser, d):
 
 
 
-# COMIENZA EL PROCESO
+###################################### COMIENZA EL PROCESO ##################################################
+
+logging.basicConfig(filename='webop.log',level=logging.INFO,
+                    format='%(asctime)s %(levelname)s: %(message)s', datefmt='%d/%m/%Y %I:%M:%S %p')
+
+# dosieres de prueba para no tener que cargar el excel continuamente
+dosieres_act = ['Moe993', 'Sus1230', 'Sus1269']
+dosieres = {
+            'Sus1314': {'es_aval': True, 'IPE_PM': 'FI-92073-0023', 'ref_1era_PM': 'A DEPOSER', 'date_fin': '18/04/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '28/12/2016', 'nombre': 'Sus1314', 'es_1ca': True, 'cliente': 'SC1', 'tipo': 'STR', 'num_EL': 38},
+            'Sus1136': {'es_aval': True, 'IPE_PM': 'FI-92073-0017', 'ref_1era_PM': 'F34837031016', 'date_fin': '18/01/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '14/12/2016', 'nombre': 'Sus1136', 'es_1ca': False, 'cliente': 'SC1', 'tipo': 'CPL', 'num_EL': 18},
+            'Sus1269': {'es_aval': False, 'IPE_PM': None, 'ref_1era_PM': None, 'date_fin': '18/01/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '14/12/2016', 'nombre': 'Sus1269', 'es_1ca': False, 'cliente': 'SC1', 'tipo': 'CPL', 'num_EL': 0},
+            'Moe993': {'es_aval': False, 'IPE_PM': None, 'ref_1era_PM': None, 'date_fin': '18/04/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'MONTEREAU-FAULT-YONNE', 'date_ini': '28/12/2016', 'nombre': 'Moe993', 'es_1ca': False, 'cliente': 'SC1', 'tipo': 'STR', 'num_EL': 0},
+            'Cly1345': {'es_aval': False, 'IPE_PM': None, 'ref_1era_PM': None, 'date_fin': '03/01/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'CLICHY', 'date_ini': '06/12/2016', 'nombre': 'Cly1345', 'es_1ca': False, 'cliente': 'SC1', 'tipo': 'SPL', 'num_EL': 17},
+            'Sus1230': {'es_aval': True, 'IPE_PM': 'FI-92073-001E', 'ref_1era_PM': 'F28968041116', 'date_fin': '18/01/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '14/12/2016', 'nombre': 'Sus1230', 'es_1ca': True, 'cliente': 'SC1', 'tipo': 'CPL', 'num_EL': 10}
+
+}
+
+# for cosa in os.listdir(r'\\server-3id2plus\03-PRODUCCION\0.CAFT\SC1\PRODUCCIÓN\Tab Suivi Prod'):
+#     b = cosa
+#     a = 2
+
+for cosa in os.listdir('//server-3id2plus/03-PRODUCCION/0.CAFT/SC1/PRODUCCIÓN/Tab Suivi Prod'):
+    b = cosa
+    a = 2
+
+# dosieres = cargarDatos(dosieres_act)
 
 for d in dosieres_act:
-    browser = set_up_browser()
-    login(browser)
-    boutique_operations(browser, dosieres[d])
-    time.sleep(4)
-    browser.close()
-    browser.quit()
-    time.sleep(5)
+    try:
+        browser = set_up_browser()
+        login(browser)
+        boutique_operations(browser, dosieres[d])
+        time.sleep(4)
+    except Exception as ex:
+        logging.info('%s No ha podido completarse por: %s', dosieres[d]['nombre'], ex.msg)
+    finally:
+        browser.quit()
+        time.sleep(5)
 b =2
