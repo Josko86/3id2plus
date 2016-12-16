@@ -46,8 +46,10 @@ def cargarDatosExcel(dosieres_act):
 # doc = openpyxl.load_workbook('SuiviJRU.xlsx')
 # doc.save('SuiviJRU.xlsx')
 
-
-    doc = openpyxl.load_workbook('SuiviJRU.xlsx', data_only=True)
+    if os.name == 'nt':
+        doc = openpyxl.load_workbook('SuiviJRU.xlsx', data_only=True)
+    else:
+        doc = openpyxl.load_workbook(r'/home/ubuntu/nas2/NAS/03-PRODUCCION/0.CAFT/SC1/PRODUCCIÓN/Tab Suivi Prod/suivi prod general SC1 practica-JRU.xlsx')
     doc.get_sheet_names()
     hoja_principal = doc.get_sheet_by_name('Tab Suivi Prod')
     dosieres = dict()
@@ -415,8 +417,8 @@ dosieres = {
 #     logging.error('No han podido cargarse los datos del excel porque: %s', ex.msg)
 
 for d in dosieres_act:
-    browser = set_up_browser()
     try:
+        browser = set_up_browser()
         login(browser)
         boutique_operations(browser, dosieres[d])
         time.sleep(4)
