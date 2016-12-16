@@ -1,4 +1,6 @@
+# -*- coding: utf-8 -*-
 from selenium import webdriver
+from selenium.webdriver import DesiredCapabilities
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 import time
@@ -39,7 +41,7 @@ def calculoFechas(tipo, col, hp):
     date = date.strftime('%d/%m/%Y')
     return date
 
-def cargarDatos(dosieres_act):
+def cargarDatosExcel(dosieres_act):
 # Carga de todos los datos necesarios del excel y los mete en un diccionario de dosieres
 # doc = openpyxl.load_workbook('SuiviJRU.xlsx')
 # doc.save('SuiviJRU.xlsx')
@@ -93,8 +95,21 @@ def cargarDatos(dosieres_act):
 
 def set_up_browser():
     # set up browser
-    binary = FirefoxBinary(r'C:\Program Files (x86)\Mozilla Firefox\firefox.exe')
-    browser = webdriver.Firefox(firefox_binary=binary)
+    # Windows
+    if os.name == 'nt':
+        ############################# FIREFOX ###########################################
+        binary = FirefoxBinary(r'C:\Program Files (x86)\Mozilla Firefox\firefox.exe')
+        browser = webdriver.Firefox(firefox_binary=binary)
+
+        ############################ PHANTOMJS ##########################################
+        # path = r'C:\Users\josko\PycharmProjects\josko\scripts\phantomjs-2.1.1-windows\bin\phantomjs.exe'
+        # browser = webdriver.PhantomJS(executable_path=path)
+    # Linux
+    else:
+        browser = webdriver.PhantomJS()
+
+
+
     browser.get('https://dro.orange-business.com/authentification?target=https://espaceclient.orange-business.com/group'
                '/divop/home?codeContexte=ece_divop&TYPE=33554433&REALMOID=06-00006a03-1ec3-1184-b5ad-5e0e0a63d064&'
                'GUID=&SMAUTHREASON=0&METHOD=GET&SMAGENTNAME=-SM-hCJfMsHRC8Nvudq1lQDbznywak%2fg%2bYsE6nklHqOsEk8XmYpdaqDy'
@@ -148,11 +163,13 @@ def boutique_operations(browser, d):
     # se abre una nueva ventana y hay que elegir el que corresponda con formato = cliente_” + nombre ciudad_ + “SPL” o “CPL” O “STR
     time.sleep(1)
     signin_window_handle = None
-    while not signin_window_handle:
-        for handle in browser.window_handles:
-            if handle != main_window_handle:
-                signin_window_handle = handle
-                break
+    # while not signin_window_handle:
+    #     for handle in browser.window_handles:
+    #         if handle != main_window_handle:
+    #             signin_window_handle = handle
+    #             break
+    time.sleep(5)
+    signin_window_handle = browser.window_handles[1]
     browser.switch_to.window(signin_window_handle)
     client = d['cliente']
     city = d['ciudad']
@@ -166,6 +183,7 @@ def boutique_operations(browser, d):
     time.sleep(2)
     valider_button = browser.find_element_by_css_selector('a.sfci_blackb:nth-child(2)') # click on button valider
     valider_button.click()
+    time.sleep(2)
     browser.switch_to.window(main_window_handle)
     time.sleep(1)
 
@@ -178,6 +196,9 @@ def boutique_operations(browser, d):
     fecha_ini = d['date_ini']
     fecha_fin = d['date_fin']
     calles = d['calles']
+    # Si esta en phantomjs tiene que entrar en el iframe
+    if browser.name == 'phantomjs':
+        browser.switch_to_frame('ece_iframe')
     time.sleep(1)
     commande = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_pm_td_input '
                                                     '> select:nth-child(1)')
@@ -370,8 +391,9 @@ def boutique_operations(browser, d):
 logging.basicConfig(filename='webop.log',level=logging.INFO,
                     format='%(asctime)s %(levelname)s: %(message)s', datefmt='%d/%m/%Y %I:%M:%S %p')
 
+
 # dosieres de prueba para no tener que cargar el excel continuamente
-dosieres_act = ['Moe993', 'Sus1230', 'Sus1269']
+dosieres_act = ['Sus1269']
 dosieres = {
             'Sus1314': {'es_aval': True, 'IPE_PM': 'FI-92073-0023', 'ref_1era_PM': 'A DEPOSER', 'date_fin': '18/04/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '28/12/2016', 'nombre': 'Sus1314', 'es_1ca': True, 'cliente': 'SC1', 'tipo': 'STR', 'num_EL': 38},
             'Sus1136': {'es_aval': True, 'IPE_PM': 'FI-92073-0017', 'ref_1era_PM': 'F34837031016', 'date_fin': '18/01/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '14/12/2016', 'nombre': 'Sus1136', 'es_1ca': False, 'cliente': 'SC1', 'tipo': 'CPL', 'num_EL': 18},
@@ -381,25 +403,30 @@ dosieres = {
             'Sus1230': {'es_aval': True, 'IPE_PM': 'FI-92073-001E', 'ref_1era_PM': 'F28968041116', 'date_fin': '18/01/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '14/12/2016', 'nombre': 'Sus1230', 'es_1ca': True, 'cliente': 'SC1', 'tipo': 'CPL', 'num_EL': 10}
 
 }
-
-# for cosa in os.listdir(r'\\server-3id2plus\03-PRODUCCION\0.CAFT\SC1\PRODUCCIÓN\Tab Suivi Prod'):
+#  FUNCIONA PARA ACCEDER AL NAS DESDE MI ORDENADOR
+# for cosa in os.listdir('Z:/03-PRODUCCION/0.CAFT/SC1/PRODUCCIÓN/Tab Suivi Prod'):
 #     b = cosa
 #     a = 2
 
-for cosa in os.listdir('//server-3id2plus/03-PRODUCCION/0.CAFT/SC1/PRODUCCIÓN/Tab Suivi Prod'):
-    b = cosa
-    a = 2
 
-# dosieres = cargarDatos(dosieres_act)
+# try:
+#     dosieres = cargarDatosExcel(dosieres_act)
+# except Exception as ex:
+#     logging.error('No han podido cargarse los datos del excel porque: %s', ex.msg)
 
 for d in dosieres_act:
+    browser = set_up_browser()
     try:
-        browser = set_up_browser()
         login(browser)
         boutique_operations(browser, dosieres[d])
         time.sleep(4)
+
     except Exception as ex:
-        logging.info('%s No ha podido completarse por: %s', dosieres[d]['nombre'], ex.msg)
+        logging.error('%s No ha podido completarse por: %s', dosieres[d]['nombre'], ex.msg)
+
+    else:
+        logging.info('%s --> Se ha procesado correctamente: ', dosieres[d]['nombre'])
+
     finally:
         browser.quit()
         time.sleep(5)
