@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import signal
+
 from selenium import webdriver
 from selenium.webdriver import DesiredCapabilities
 from selenium.webdriver.common.keys import Keys
@@ -433,6 +435,8 @@ def obtenerFCI():
             logging.info('%s --> Se ha procesado correctamente: ', dosieres[d]['nombre'])
 
         finally:
+            if os.name != 'nt':
+                browser.service.process.send_signal(signal.SIGTERM)
             browser.quit()
             time.sleep(5)
 

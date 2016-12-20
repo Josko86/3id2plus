@@ -26,8 +26,9 @@ SECRET_KEY = 'bcjskm3c+z14#&^efsk(iyyf!!=n%*$crc9_ym2mu47)=wnn(!'
 DEBUG = True
 
 ALLOWED_HOSTS = ['ec2-35-162-44-189.us-west-2.compute.amazonaws.com',
-                 'localhost']
-
+                 'localhost',
+                 '192.168.1.64'
+                 ]
 
 # Application definition
 
