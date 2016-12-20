@@ -20,5 +20,6 @@ from ezapa import views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^obtenerfci/', views.obtenerNumeroComanda)
+    url(r'^obtenerfci/', views.obtenerNumeroComanda),
+    url(r'^prueba/', views.prueba)
 ]

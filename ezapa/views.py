@@ -7,3 +7,6 @@ from scripts.obtenfci import obtenerFCI
 def obtenerNumeroComanda(request):
     obtenerFCI()
     return render(request, 'obtenerfci.html')
+
+def prueba(request):
+    return render(request, 'obtenerfci.html')
