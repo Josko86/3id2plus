@@ -415,10 +415,10 @@ def obtenerFCI():
     #     a = 2
 
 
-    # try:
-    #     dosieres = cargarDatosExcel(dosieres_act)
-    # except Exception as ex:
-    #     logging.error('No han podido cargarse los datos del excel porque: %s', ex.msg)
+    try:
+        dosieres = cargarDatosExcel(dosieres_act)
+    except Exception as ex:
+        logging.error('No han podido cargarse los datos del excel porque: %s', ex.msg)
 
 
 
