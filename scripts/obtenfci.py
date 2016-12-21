@@ -400,15 +400,15 @@ def obtenerFCI():
 
     # dosieres de prueba para no tener que cargar el excel continuamente
     dosieres_act = ['Sus1269', 'Sus1314']
-    dosieres = {
-                'Sus1314': {'es_aval': True, 'IPE_PM': 'FI-92073-0023', 'ref_1era_PM': 'A DEPOSER', 'date_fin': '18/04/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '28/12/2016', 'nombre': 'Sus1314', 'es_1ca': True, 'cliente': 'SC1', 'tipo': 'STR', 'num_EL': 38},
-                'Sus1136': {'es_aval': True, 'IPE_PM': 'FI-92073-0017', 'ref_1era_PM': 'F34837031016', 'date_fin': '18/01/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '14/12/2016', 'nombre': 'Sus1136', 'es_1ca': False, 'cliente': 'SC1', 'tipo': 'CPL', 'num_EL': 18},
-                'Sus1269': {'es_aval': False, 'IPE_PM': None, 'ref_1era_PM': None, 'date_fin': '18/01/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '14/12/2016', 'nombre': 'Sus1269', 'es_1ca': False, 'cliente': 'SC1', 'tipo': 'CPL', 'num_EL': 0},
-                'Moe993': {'es_aval': False, 'IPE_PM': None, 'ref_1era_PM': None, 'date_fin': '18/04/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'MONTEREAU-FAULT-YONNE', 'date_ini': '28/12/2016', 'nombre': 'Moe993', 'es_1ca': False, 'cliente': 'SC1', 'tipo': 'STR', 'num_EL': 0},
-                'Cly1345': {'es_aval': False, 'IPE_PM': None, 'ref_1era_PM': None, 'date_fin': '03/01/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'CLICHY', 'date_ini': '06/12/2016', 'nombre': 'Cly1345', 'es_1ca': False, 'cliente': 'SC1', 'tipo': 'SPL', 'num_EL': 17},
-                'Sus1230': {'es_aval': True, 'IPE_PM': 'FI-92073-001E', 'ref_1era_PM': 'F28968041116', 'date_fin': '18/01/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '14/12/2016', 'nombre': 'Sus1230', 'es_1ca': True, 'cliente': 'SC1', 'tipo': 'CPL', 'num_EL': 10}
-
-    }
+    # dosieres = {
+    #             'Sus1314': {'es_aval': True, 'IPE_PM': 'FI-92073-0023', 'ref_1era_PM': 'A DEPOSER', 'date_fin': '18/04/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '28/12/2016', 'nombre': 'Sus1314', 'es_1ca': True, 'cliente': 'SC1', 'tipo': 'STR', 'num_EL': 38},
+    #             'Sus1136': {'es_aval': True, 'IPE_PM': 'FI-92073-0017', 'ref_1era_PM': 'F34837031016', 'date_fin': '18/01/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '14/12/2016', 'nombre': 'Sus1136', 'es_1ca': False, 'cliente': 'SC1', 'tipo': 'CPL', 'num_EL': 18},
+    #             'Sus1269': {'es_aval': False, 'IPE_PM': None, 'ref_1era_PM': None, 'date_fin': '18/01/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '14/12/2016', 'nombre': 'Sus1269', 'es_1ca': False, 'cliente': 'SC1', 'tipo': 'CPL', 'num_EL': 0},
+    #             'Moe993': {'es_aval': False, 'IPE_PM': None, 'ref_1era_PM': None, 'date_fin': '18/04/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'MONTEREAU-FAULT-YONNE', 'date_ini': '28/12/2016', 'nombre': 'Moe993', 'es_1ca': False, 'cliente': 'SC1', 'tipo': 'STR', 'num_EL': 0},
+    #             'Cly1345': {'es_aval': False, 'IPE_PM': None, 'ref_1era_PM': None, 'date_fin': '03/01/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'CLICHY', 'date_ini': '06/12/2016', 'nombre': 'Cly1345', 'es_1ca': False, 'cliente': 'SC1', 'tipo': 'SPL', 'num_EL': 17},
+    #             'Sus1230': {'es_aval': True, 'IPE_PM': 'FI-92073-001E', 'ref_1era_PM': 'F28968041116', 'date_fin': '18/01/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '14/12/2016', 'nombre': 'Sus1230', 'es_1ca': True, 'cliente': 'SC1', 'tipo': 'CPL', 'num_EL': 10}
+    #
+    # }
     #  FUNCIONA PARA ACCEDER AL NAS DESDE MI ORDENADOR
     # for cosa in os.listdir('Z:/03-PRODUCCION/0.CAFT/SC1/PRODUCCIÓN/Tab Suivi Prod'):
     #     b = cosa
