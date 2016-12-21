@@ -51,7 +51,8 @@ def cargarDatosExcel(dosieres_act):
     if os.name == 'nt':
         doc = openpyxl.load_workbook('SuiviJRU.xlsx', data_only=True)
     else:
-        doc = openpyxl.load_workbook(r'/home/ubuntu/nas2/NAS/03-PRODUCCION/0.CAFT/SC1/PRODUCCIÓN/Tab Suivi Prod/suivi prod general SC1 practica-JRU.xlsx')
+        # doc = openpyxl.load_workbook(r'/home/ubuntu/nas2/NAS/03-PRODUCCION/0.CAFT/SC1/PRODUCCIÓN/Tab Suivi Prod/suivi prod general SC1 practica-JRU.xlsx', data_only=True)
+        doc = openpyxl.load_workbook(r'/home/ubuntu/3id2plus/SuiviJRU.xlsx', data_only=True)
     doc.get_sheet_names()
     hoja_principal = doc.get_sheet_by_name('Tab Suivi Prod')
     dosieres = dict()
