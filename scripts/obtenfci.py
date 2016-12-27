@@ -2,7 +2,6 @@
 import signal
 
 from selenium import webdriver
-from selenium.webdriver import DesiredCapabilities
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 import time
@@ -50,9 +49,10 @@ def cargarDatosExcel(dosieres_act):
 
     if os.name == 'nt':
         doc = openpyxl.load_workbook('SuiviJRU.xlsx', data_only=True)
+        # doc = openpyxl.load_workbook(r'Z:/03-PRODUCCION/0.CAFT/SC1/PRODUCCIÓN/Tab Suivi Prod/suivi prod general SC1 practica-JRU.xlsx', data_only=True)
     else:
-        # doc = openpyxl.load_workbook(r'/home/ubuntu/nas2/NAS/03-PRODUCCION/0.CAFT/SC1/PRODUCCIÓN/Tab Suivi Prod/suivi prod general SC1 practica-JRU.xlsx', data_only=True)
         doc = openpyxl.load_workbook(r'/home/ubuntu/3id2plus/SuiviJRU.xlsx', data_only=True)
+        # doc = openpyxl.load_workbook(r'/home/ubuntu/nas/NAS/03-PRODUCCION/0.CAFT/SC1/PRODUCCIÓN/Tab Suivi Prod/suivi prod general SC1 practica-JRU.xlsx', data_only=True)
     doc.get_sheet_names()
     hoja_principal = doc.get_sheet_by_name('Tab Suivi Prod')
     dosieres = dict()
@@ -72,11 +72,13 @@ def cargarDatosExcel(dosieres_act):
                     'cliente': 'SC1',
                     'solo_arquetas': True,
                     'calles': ['rue del percebe', 'calle street', 'callejon hammer'],
-                    'ref_cli': ''
+                    'ref_cli': hoja_principal.cell(row= celda.row, column=73).value,
+                    'row': celda.row
                 }
                 dosier['date_ini'] = calculoFechas(dosier['tipo'], 4, hoja_principal)
                 dosier['date_fin'] = calculoFechas(dosier['tipo'], 5, hoja_principal)
                 dosieres[dosier['nombre']] = dosier
+    # doc.save('SuiviJRU.xlsx')
     return dosieres
 
 ############################################ EJEMPLO DOSIER ###########################
@@ -95,6 +97,8 @@ def cargarDatosExcel(dosieres_act):
 #     'date_fin': '02/01/2016',
 #     'calles': ['rue del percebe', 'calle street'],
 #     'ref_cli': 'SC1_IMB_93045_C_00X1',
+#     'fci': 'F234124123'
+#     'row': 345
 # }
 ######################################################################################
 
@@ -270,84 +274,84 @@ def boutique_operations(browser, d):
                 add_button.click()
 
     # Si el dosier es complejo o estructurante
-    # a = zone de commande
-    # b = IPE de PM
-    # c = type de commande
-    # d = Num el
-    # e = cable mixte
-    # f = FCI del primer
+    # af = zone de commande
+    # bf = IPE de PM
+    # cf = type de commande
+    # df = Num el
+    # ef = cable mixte
+    # ff = FCI del primer
     if dos_type == 'CPL' or dos_type == 'STR':
         if es_aval and not aval_primera:
 
-            a = browser.find_element_by_css_selector(
+            af = browser.find_element_by_css_selector(
                 '#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_pm_td_input > select:nth-child(1) > option:nth-child(2)')
-            a.click()
+            af.click()
             time.sleep(1)
-            b = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:ref_ipe_td_input > '
+            bf = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:ref_ipe_td_input > '
                                                      'input:nth-child(1)')
-            b.clear()
-            b.send_keys(IPE_PM)
+            bf.clear()
+            bf.send_keys(IPE_PM)
             time.sleep(1)
-            c = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:type_cde_td_input'
+            cf = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:type_cde_td_input'
                                                      ' > select:nth-child(1) > option:nth-child(3)')
-            c.click()
+            cf.click()
             time.sleep(1)
-            f = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:ref_cde_aval_pm_td_input > '
+            ff = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:ref_cde_aval_pm_td_input > '
                                                      'input:nth-child(1)')
-            f.clear()
+            ff.clear()
             time.sleep(1)
-            f.send_keys(ref_1era_PM)
+            ff.send_keys(ref_1era_PM)
 
         if es_aval and aval_primera:
 
             num_el = d['num_EL']
 
-            a = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:'
+            af = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:'
                                                      'zone_cde_pm_td_input > select:nth-child(1) > option:nth-child(2)')
-            a.click()
+            af.click()
             time.sleep(1)
-            b = browser.find_element_by_css_selector(
+            bf = browser.find_element_by_css_selector(
                 '#\/com\:commande\/gcblo\:contexte_com\/gcblo\:ref_ipe_td_input > input:nth-child(1)')
-            b.clear()
-            b.send_keys(IPE_PM)
-            c = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:type_cde_td_input > '
+            bf.clear()
+            bf.send_keys(IPE_PM)
+            cf = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:type_cde_td_input > '
                                                      'select:nth-child(1)')
-            c.click()
+            cf.click()
             time.sleep(1)
             c1 = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:type_cde_td_input'
                                                       ' > select:nth-child(1) > option:nth-child(2)')
             c1.click()
-            d = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:taille_pm_td_input'
+            df = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:taille_pm_td_input'
                                                      ' > input:nth-child(1)')
-            d.send_keys(num_el)
+            df.send_keys(num_el)
             time.sleep(1)
-            e = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:cab_mixte_td_input'
+            ef = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:cab_mixte_td_input'
                                                      ' > select:nth-child(1)')
-            e.click()
+            ef.click()
             time.sleep(1)
             e1 = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:cab_mixte_td_input'
                                                       ' > select:nth-child(1) > option:nth-child(3)')
             e1.click()
-            f = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:ref_cde_aval_pm_td_input'
+            ff = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:ref_cde_aval_pm_td_input'
                                                      ' > input:nth-child(1)')
-            f.clear()
+            ff.clear()
             time.sleep(1)
 
         if not es_aval:
             time.sleep(1)
-            a = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_pm_td_'
+            af = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_pm_td_'
                                                      'input > select:nth-child(1) > option:nth-child(3)')
-            a.click()
+            af.click()
             time.sleep(1)
             a1 = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_pm_td_input'
                                                       ' > select:nth-child(1) > option:nth-child(3)')
             a1.click()
-            b = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:ref_ipe_td_input'
+            bf = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:ref_ipe_td_input'
                                                      ' > input:nth-child(1)')
-            b.clear()
-            c = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:type_cde_td_input'
+            bf.clear()
+            cf = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:type_cde_td_input'
                                                      ' > select:nth-child(1)')
-            c.click()
+            cf.click()
             time.sleep(1)
             c1 = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:type_cde_td_input'
                                                       ' > select:nth-child(1) > option:nth-child(1)')
@@ -389,7 +393,10 @@ def boutique_operations(browser, d):
                 add_button = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:' + diferencial_tipo + '\/gcblo\:arteres_princ\[1\]_td_label1 > a:nth-child(1) > img:nth-child(1)')
                 add_button.click()
 
-
+# TODO recuperar el numero fci
+    fci = 'F4214120316'
+    d['fci'] = fci
+    b = 1
 
 ###################################### COMIENZA EL PROCESO ##################################################
 
@@ -399,7 +406,7 @@ def obtenerFCI():
 
 
     # dosieres de prueba para no tener que cargar el excel continuamente
-    dosieres_act = ['Sus1269', 'Sus1314']
+    dosieres_act = ['Sus1269', 'Sus1136','Sus1314']
     # dosieres = {
     #             'Sus1314': {'es_aval': True, 'IPE_PM': 'FI-92073-0023', 'ref_1era_PM': 'A DEPOSER', 'date_fin': '18/04/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '28/12/2016', 'nombre': 'Sus1314', 'es_1ca': True, 'cliente': 'SC1', 'tipo': 'STR', 'num_EL': 38},
     #             'Sus1136': {'es_aval': True, 'IPE_PM': 'FI-92073-0017', 'ref_1era_PM': 'F34837031016', 'date_fin': '18/01/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '14/12/2016', 'nombre': 'Sus1136', 'es_1ca': False, 'cliente': 'SC1', 'tipo': 'CPL', 'num_EL': 18},
@@ -409,6 +416,8 @@ def obtenerFCI():
     #             'Sus1230': {'es_aval': True, 'IPE_PM': 'FI-92073-001E', 'ref_1era_PM': 'F28968041116', 'date_fin': '18/01/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '14/12/2016', 'nombre': 'Sus1230', 'es_1ca': True, 'cliente': 'SC1', 'tipo': 'CPL', 'num_EL': 10}
     #
     # }
+
+
     #  FUNCIONA PARA ACCEDER AL NAS DESDE MI ORDENADOR
     # for cosa in os.listdir('Z:/03-PRODUCCION/0.CAFT/SC1/PRODUCCIÓN/Tab Suivi Prod'):
     #     b = cosa
@@ -419,8 +428,12 @@ def obtenerFCI():
         dosieres = cargarDatosExcel(dosieres_act)
     except Exception as ex:
         logging.error('No han podido cargarse los datos del excel porque: %s', ex.msg)
+    result = {}
 
-
+    import win32com.client as win32
+    excel = win32.gencache.EnsureDispatch('Excel.Application')
+    wb = excel.Workbooks.Open(r'C:\Users\josko\PycharmProjects\josko\SuiviJRU.xlsx')
+    ws = wb.Worksheets('Tab Suivi Prod')
 
     for d in dosieres_act:
         try:
@@ -428,12 +441,17 @@ def obtenerFCI():
             login(browser)
             boutique_operations(browser, dosieres[d])
             time.sleep(4)
+            ws.Cells(dosieres[d]['row'], 36).Value = dosieres[d]['fci']
+            fecha_fci = dosieres[d]['fci'][-4:-2] + '-' + dosieres[d]['fci'][-6:-4] + '-'  + dosieres[d]['fci'][-2:]
+            ws.Cells(dosieres[d]['row'], 37).Value = fecha_fci
 
         except Exception as ex:
             logging.error('%s No ha podido completarse por: %s', dosieres[d]['nombre'], ex.msg)
+            result[dosieres[d]['nombre']] = dosieres[d]['nombre'] + ' No ha podido completarse por: ' + ex.msg
 
         else:
             logging.info('%s --> Se ha procesado correctamente: ', dosieres[d]['nombre'])
+            result[dosieres[d]['nombre']] = dosieres[d]['nombre'] + '  --> Se ha procesado correctamente: '
 
         finally:
             if os.name != 'nt':
@@ -441,5 +459,8 @@ def obtenerFCI():
             browser.quit()
             time.sleep(5)
 
+    wb.SaveAs(r'C:\Users\josko\PycharmProjects\josko\SuiviJRU.xlsx')
+    excel.Application.Quit()
+    return result
 
-# obtenerFCI()
+
