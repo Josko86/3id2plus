@@ -7,7 +7,7 @@ from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 import time
 import logging
 import openpyxl
-import os
+import shutil, os
 
 
 # Funciones utils
@@ -171,7 +171,7 @@ def boutique_operations(browser, d):
     browser.find_element_by_css_selector('a.sfci_blackb:nth-child(5)').click() #pulsamos en 'deposer a partir d'une...
     # se abre una nueva ventana y hay que elegir el que corresponda con formato = cliente_” + nombre ciudad_ + “SPL” o “CPL” O “STR
     time.sleep(1)
-    signin_window_handle = None
+    # signin_window_handle = None
     # while not signin_window_handle:
     #     for handle in browser.window_handles:
     #         if handle != main_window_handle:
@@ -398,6 +398,20 @@ def boutique_operations(browser, d):
     d['fci'] = fci
     b = 1
 
+
+def mover_ficheros(d):
+    ruta = os.getcwd() + os.sep
+    origen = ruta + 'movido'
+    destino = 'C:\\Users\\josko\\PycharmProjects\\josko\\mover\\'
+    if os.path.exists(origen):
+        ruta = shutil.move(origen, destino)
+        print('El directorio ha sido movido a', ruta)
+    else:
+        print('El directorio origen no existe')
+    pass
+
+
+
 ###################################### COMIENZA EL PROCESO ##################################################
 
 def obtenerFCI():
@@ -406,7 +420,7 @@ def obtenerFCI():
 
 
     # dosieres de prueba para no tener que cargar el excel continuamente
-    dosieres_act = ['Sus1269', 'Sus1136','Sus1314']
+    dosieres_act = ['Sus1269', 'Sus1136','Sus1314', 'Moe993', 'Cly1345']
     # dosieres = {
     #             'Sus1314': {'es_aval': True, 'IPE_PM': 'FI-92073-0023', 'ref_1era_PM': 'A DEPOSER', 'date_fin': '18/04/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '28/12/2016', 'nombre': 'Sus1314', 'es_1ca': True, 'cliente': 'SC1', 'tipo': 'STR', 'num_EL': 38},
     #             'Sus1136': {'es_aval': True, 'IPE_PM': 'FI-92073-0017', 'ref_1era_PM': 'F34837031016', 'date_fin': '18/01/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '14/12/2016', 'nombre': 'Sus1136', 'es_1ca': False, 'cliente': 'SC1', 'tipo': 'CPL', 'num_EL': 18},
@@ -444,6 +458,7 @@ def obtenerFCI():
             ws.Cells(dosieres[d]['row'], 36).Value = dosieres[d]['fci']
             fecha_fci = dosieres[d]['fci'][-4:-2] + '-' + dosieres[d]['fci'][-6:-4] + '-'  + dosieres[d]['fci'][-2:]
             ws.Cells(dosieres[d]['row'], 37).Value = fecha_fci
+            # mover_ficheros(dosieres[d])
 
         except Exception as ex:
             logging.error('%s No ha podido completarse por: %s', dosieres[d]['nombre'], ex.msg)
