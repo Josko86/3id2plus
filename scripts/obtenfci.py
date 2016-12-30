@@ -399,6 +399,7 @@ def boutique_operations(browser, d):
     b = 1
 
 
+#  TODO
 def mover_ficheros(d):
     ruta = os.getcwd() + os.sep
     origen = ruta + 'movido'
@@ -420,7 +421,7 @@ def obtenerFCI():
 
 
     # dosieres de prueba para no tener que cargar el excel continuamente
-    dosieres_act = ['Sus1269', 'Sus1136']
+    dosieres_act = ['Sus1269', 'Sus1136', 'Sus1314', 'Moe993', 'blalbal' ]
     # dosieres = {
     #             'Sus1314': {'es_aval': True, 'IPE_PM': 'FI-92073-0023', 'ref_1era_PM': 'A DEPOSER', 'date_fin': '18/04/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '28/12/2016', 'nombre': 'Sus1314', 'es_1ca': True, 'cliente': 'SC1', 'tipo': 'STR', 'num_EL': 38},
     #             'Sus1136': {'es_aval': True, 'IPE_PM': 'FI-92073-0017', 'ref_1era_PM': 'F34837031016', 'date_fin': '18/01/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '14/12/2016', 'nombre': 'Sus1136', 'es_1ca': False, 'cliente': 'SC1', 'tipo': 'CPL', 'num_EL': 18},

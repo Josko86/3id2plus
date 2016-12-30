@@ -21,5 +21,6 @@ from ezapa import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^obtenerfci/', views.obtenerNumeroComanda, name='obtenerfci'),
+    url(r'^ipon/', views.ipon, name='ipon'),
     url(r'^prueba/', views.prueba, name='prueba')
 ]
