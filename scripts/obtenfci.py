@@ -44,6 +44,7 @@ def calculoFechas(tipo, col, hp):
 
 def cargarDatosExcel(dosieres_act):
 # Carga de todos los datos necesarios del excel y los mete en un diccionario de dosieres
+    print('Carga de todos los datos necesarios del excel y los mete en un diccionario de dosieres')
 # doc = openpyxl.load_workbook('SuiviJRU.xlsx')
 # doc.save('SuiviJRU.xlsx')
 
@@ -104,6 +105,7 @@ def cargarDatosExcel(dosieres_act):
 
 def set_up_browser():
     # set up browser
+    print('set up browser')
     # Windows
     if os.name == 'nt':
         ############################# FIREFOX ###########################################
@@ -126,7 +128,7 @@ def set_up_browser():
     return browser
 
 def login(browser):
-    # login
+    print('login')
     elem = browser.find_element_by_id("username")
     elem.send_keys("michael.yniesta")
     elem2 = browser.find_element_by_id("password")
@@ -136,7 +138,7 @@ def login(browser):
 
 
 def boutique_operations(browser, d):
-    # boutique operations
+    print('boutique operations')
     dos_type = d['tipo']
     browser.get('https://espaceclient.orange-business.com/group/divop/boutique-operateurs')
     time.sleep(3)
@@ -421,7 +423,7 @@ def obtenerFCI():
 
 
     # dosieres de prueba para no tener que cargar el excel continuamente
-    dosieres_act = ['Sus1269', 'Sus1136', 'Sus1314', 'Moe993', 'blalbal' ]
+    dosieres_act = ['Sus1269', 'Sus1136', 'Sus1314', 'Moe993']
     # dosieres = {
     #             'Sus1314': {'es_aval': True, 'IPE_PM': 'FI-92073-0023', 'ref_1era_PM': 'A DEPOSER', 'date_fin': '18/04/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '28/12/2016', 'nombre': 'Sus1314', 'es_1ca': True, 'cliente': 'SC1', 'tipo': 'STR', 'num_EL': 38},
     #             'Sus1136': {'es_aval': True, 'IPE_PM': 'FI-92073-0017', 'ref_1era_PM': 'F34837031016', 'date_fin': '18/01/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '14/12/2016', 'nombre': 'Sus1136', 'es_1ca': False, 'cliente': 'SC1', 'tipo': 'CPL', 'num_EL': 18},
@@ -446,6 +448,8 @@ def obtenerFCI():
     result = {}
 
     import win32com.client as win32
+    import pythoncom
+    pythoncom.CoInitialize()
     excel = win32.gencache.EnsureDispatch('Excel.Application')
     if os.name == 'nt':
         wb = excel.Workbooks.Open(r'C:\Users\josko\PycharmProjects\josko\SuiviJRU.xlsx')
@@ -478,6 +482,7 @@ def obtenerFCI():
             browser.quit()
             time.sleep(5)
 
+    print('Salvando excel')
     wb.SaveAs(r'C:\Users\josko\PycharmProjects\josko\SuiviJRU.xlsx')
     excel.Application.Quit()
     return result

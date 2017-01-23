@@ -11,16 +11,16 @@ def obtenerNumeroComanda(request):
     c = Context({'result': result})
     return render(request, 'obtenerfci.html', c)
 
-def ipon(request):
+def ipon(request, nra):
     person = {
         '1': 'SUS se ha completado correctamente',
         '2': 'DDSD1  Ha tenido un error'
     }
     c = Context({'person': person})
-    ejecutar_ipon()
+    ejecutar_ipon(nra)
     return render(request, 'obtenerfci.html', c)
 
-def prueba(request):
+def prueba(request, nra):
     person = {
         '1' : 'SUS se ha completado correctamente',
         '2' : 'DDSD1  Ha tenido un error'
