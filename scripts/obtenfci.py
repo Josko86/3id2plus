@@ -7,6 +7,9 @@ from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 import time
 import logging
 import openpyxl
+# import win32com.client as win32
+from pyautocad import Autocad, APoint
+import ezdxf
 import shutil, os
 
 
@@ -22,11 +25,11 @@ def esAval(row, hp):
 
 def calculoTipo(row, hp):
     global tipo
-    if hp.cell(row= row, column= 18).value == 'SIMPLE':
+    if hp.cell(row= row, column= 20).value == 'SIMPLE':
         tipo = 'SPL'
-    elif hp.cell(row= row, column= 18).value == 'COMPLEXE':
+    elif hp.cell(row= row, column= 20).value == 'COMPLEXE':
         tipo = 'CPL'
-    elif hp.cell(row= row, column= 18).value == 'STRUCTURANTE':
+    elif hp.cell(row= row, column= 20).value == 'STRUCTURANTE':
         tipo = 'STR'
     return tipo
 
@@ -42,7 +45,42 @@ def calculoFechas(tipo, col, hp):
     date = date.strftime('%d/%m/%Y')
     return date
 
-def cargarDatosExcel(dosieres_act):
+
+def calculoArquetas(row, hp):
+    global arquetas
+    if hp.cell(row=row, column=25).value != 0 and hp.cell(row=row, column=26).value == 0:
+        arquetas = 'gc'
+    elif hp.cell(row=row, column=25).value != 0 and hp.cell(row=row, column=26).value != 0:
+        arquetas = 'gt+p'
+    elif hp.cell(row=row, column=25).value == 0 and hp.cell(row=row, column=26).value != 0:
+        arquetas = 'p'
+    return arquetas
+
+
+def calculoNumel(row,hp):
+    global num_el
+    if hp.cell(row=row, column=713).value == None:
+        num_el = '0'
+    else:
+        a = hp.cell(row=row, column=713).value
+        num_el = str(a)
+    return num_el
+
+
+def calculoCalles(row,hp):
+    global calles
+    calles = []
+    if hp.cell(row=row, column=7).value == 'D2 IMB':
+        calles.append(hp.cell(row=row, column=12).value + ' ' + hp.cell(row=row, column=13).value)
+    if hp.cell(row=row, column=14).value != None:
+        otras_calles = hp.cell(row=row, column=14).value
+        otras_calles = otras_calles.split(sep='/')
+        for c in otras_calles:
+            calles.append(c)
+    return calles
+
+
+def cargarDatosExcel():
 # Carga de todos los datos necesarios del excel y los mete en un diccionario de dosieres
     print('Carga de todos los datos necesarios del excel y los mete en un diccionario de dosieres')
 # doc = openpyxl.load_workbook('SuiviJRU.xlsx')
@@ -60,20 +98,23 @@ def cargarDatosExcel(dosieres_act):
 
     for row in hoja_principal.iter_rows(min_row=1, max_col=1, max_row=hoja_principal.max_row):
         for celda in row:
-            if celda.value in dosieres_act:
+            #TODO if celda.value in dosieres_act:  -->  Para seleccionar los dosieres que se hacen
+            if hoja_principal.cell(row=celda.row, column=20).value == 'SIMPLE' and \
+                            hoja_principal.cell(row=celda.row, column=40).value == None and celda.row != 1565:
                 dosier = {
                     'nombre': celda.value,
-                    'ciudad': hoja_principal.cell(row= celda.row, column= 15).value,
+                    'ciudad': hoja_principal.cell(row= celda.row, column= 16).value,
                     'es_aval': esAval(celda.row, hoja_principal),
                     'tipo': calculoTipo(celda.row, hoja_principal),
-                    'es_1ca': hoja_principal.cell(row= celda.row, column=17).value == '1er CA',
+                    'es_1ca': hoja_principal.cell(row= celda.row, column=19).value == '1er CA',
                     'IPE_PM': hoja_principal.cell(row= celda.row, column= 8).value,
-                    'ref_1era_PM': hoja_principal.cell(row= celda.row, column= 14).value,
-                    'num_EL': hoja_principal.cell(row= celda.row, column=30).value,
+                    'ref_1era_PM': hoja_principal.cell(row= celda.row, column= 15).value,
+                    'num_EL': calculoNumel(celda.row, hoja_principal),
                     'cliente': 'SC1',
-                    'solo_arquetas': True,
-                    'calles': ['rue del percebe', 'calle street', 'callejon hammer'],
-                    'ref_cli': hoja_principal.cell(row= celda.row, column=73).value,
+                    'solo_arquetas': calculoArquetas(celda.row, hoja_principal), # gc, gc+p, p
+                    'calles': calculoCalles(celda.row, hoja_principal),
+                    'ref_cli': hoja_principal.cell(row= celda.row, column=79).value,
+                    'formulario': 'SC1_ST_GERMAIN_LAXIS_SPL', #TODO poner la columna que ponga el nombre del form
                     'row': celda.row
                 }
                 dosier['date_ini'] = calculoFechas(dosier['tipo'], 4, hoja_principal)
@@ -171,7 +212,7 @@ def boutique_operations(browser, d):
     c.click()
     time.sleep(1)
     browser.find_element_by_css_selector('a.sfci_blackb:nth-child(5)').click() #pulsamos en 'deposer a partir d'une...
-    # se abre una nueva ventana y hay que elegir el que corresponda con formato = cliente_” + nombre ciudad_ + “SPL” o “CPL” O “STR
+    # se abre una nueva ventana y hay que elegir el formulario que corresponda
     time.sleep(1)
     # signin_window_handle = None
     # while not signin_window_handle:
@@ -182,11 +223,10 @@ def boutique_operations(browser, d):
     time.sleep(5)
     signin_window_handle = browser.window_handles[1]
     browser.switch_to.window(signin_window_handle)
-    client = d['cliente']
-    city = d['ciudad']
+    formulario = d['formulario']
     time.sleep(5)
 
-    row_text = browser.find_element_by_xpath("//*[contains(text(), '" + client + '_' + city + '_' + dos_type + "')]")
+    row_text = browser.find_element_by_xpath("//*[contains(text(), '" + formulario + "')]")
     row_parent = row_text.find_element_by_xpath('..')
     clickable_button = row_parent.find_element_by_xpath('.//input')
     clickable_button.click()
@@ -218,17 +258,20 @@ def boutique_operations(browser, d):
 
     # Para dosier Simple
     if dos_type == 'SPL':
+        aval1 = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:ref_cde_aval_pm_td'
+                                                     '_input > input:nth-child(1)')
+        aval1.clear()
+        time.sleep(1)
+        aval2 = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:ref_ipe_td_input '
+                                                     '> input:nth-child(1)')
+        aval2.clear()
+        time.sleep(1)
         if es_aval:
             #opción marcada por defecto. No modificar el select, solo los 2 campos siguientes
-
-            aval1 = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:ref_cde_aval_pm_td'
-                                                         '_input > input:nth-child(1)')
-            aval1.clear()
-            time.sleep(1)
+            aval_choice = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde'
+                                                               '_pm_td_input > select:nth-child(1) > option:nth-child(3)')
+            aval_choice.click()
             aval1.send_keys(ref_1era_PM)
-            aval2 = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:ref_ipe_td_input '
-                                                         '> input:nth-child(1)')
-            aval2.clear()
             aval2.send_keys(IPE_PM)
 
         elif not es_aval:
@@ -241,11 +284,16 @@ def boutique_operations(browser, d):
 
         time.sleep(2)
 
-        # Si solo arquetas se deja por defecto GC, si no se pone GC et apus aeris
-        if not solo_arquetas:
+        # Si solo arquetas se deja por defecto GC, si arquetas + poteaux se pone GC et apus aeris
+        select_postes = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:cont_com\/gcblo\:cde_'
+                                                             'concerne > option:nth-child(2)')
+        if solo_arquetas == 'gc+p':
             select_postes = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:cont_com\/gcblo\:cde_'
-                                                                   'concerne > option:nth-child(4)')
-            select_postes.click()
+                                                                 'concerne > option:nth-child(4)')
+        elif solo_arquetas == 'p':
+            select_postes = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:cont_com\/gcblo\:cde_'
+                                                                 'concerne > option:nth-child(3)')
+        select_postes.click()
 
         time.sleep(1)
         # Fechas de simple
@@ -261,7 +309,7 @@ def boutique_operations(browser, d):
         form_fecha_fin.send_keys(fecha_fin)
 
         time.sleep(1)
-    #     Annadimos las calles que pasan por el recorrido
+        #     Annadimos las calles que pasan por el recorrido
         for i in range(len(calles)):
             calle_form = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contenu_decl_trvx\/gcblo\:'
                                                               'arteres_princ\['+str(i+1)+'\]_td_input > input:nth-child(1)')
@@ -283,96 +331,91 @@ def boutique_operations(browser, d):
     # ef = cable mixte
     # ff = FCI del primer
     if dos_type == 'CPL' or dos_type == 'STR':
-        if es_aval and not aval_primera:
+        bf = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:ref_ipe_td_input > '
+                                                  'input:nth-child(1)')
+        bf.clear()
+        time.sleep(1)
+        df = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:taille_pm_td_input'
+                                                  ' > input:nth-child(1)')
+        df.clear()
+        time.sleep(1)
+        ff = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:ref_cde_aval_pm_td_'
+                                                  'input > input:nth-child(1)')
+        ff.clear()
+        time.sleep(1)
 
-            af = browser.find_element_by_css_selector(
-                '#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_pm_td_input > select:nth-child(1) > option:nth-child(2)')
+        if es_aval and not aval_primera:
+            af = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_pm_'
+                                                      'td_input > select:nth-child(1) > option:nth-child(2)')
             af.click()
             time.sleep(1)
-            bf = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:ref_ipe_td_input > '
-                                                     'input:nth-child(1)')
-            bf.clear()
             bf.send_keys(IPE_PM)
             time.sleep(1)
             cf = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:type_cde_td_input'
-                                                     ' > select:nth-child(1) > option:nth-child(3)')
+                                                      ' > select:nth-child(1) > option:nth-child(3)')
             cf.click()
-            time.sleep(1)
-            ff = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:ref_cde_aval_pm_td_input > '
-                                                     'input:nth-child(1)')
-            ff.clear()
             time.sleep(1)
             ff.send_keys(ref_1era_PM)
 
         if es_aval and aval_primera:
-
             num_el = d['num_EL']
-
             af = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:'
-                                                     'zone_cde_pm_td_input > select:nth-child(1) > option:nth-child(2)')
+                                                      'zone_cde_pm_td_input > select:nth-child(1) > option:nth-child(2)')
             af.click()
             time.sleep(1)
-            bf = browser.find_element_by_css_selector(
-                '#\/com\:commande\/gcblo\:contexte_com\/gcblo\:ref_ipe_td_input > input:nth-child(1)')
-            bf.clear()
             bf.send_keys(IPE_PM)
             cf = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:type_cde_td_input > '
-                                                     'select:nth-child(1)')
+                                                      'select:nth-child(1)')
             cf.click()
             time.sleep(1)
             c1 = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:type_cde_td_input'
                                                       ' > select:nth-child(1) > option:nth-child(2)')
             c1.click()
-            df = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:taille_pm_td_input'
-                                                     ' > input:nth-child(1)')
             df.send_keys(num_el)
             time.sleep(1)
             ef = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:cab_mixte_td_input'
-                                                     ' > select:nth-child(1)')
+                                                      ' > select:nth-child(1)')
             ef.click()
             time.sleep(1)
             e1 = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:cab_mixte_td_input'
                                                       ' > select:nth-child(1) > option:nth-child(3)')
             e1.click()
-            ff = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:ref_cde_aval_pm_td_input'
-                                                     ' > input:nth-child(1)')
-            ff.clear()
             time.sleep(1)
 
         if not es_aval:
             time.sleep(1)
             af = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_pm_td_'
-                                                     'input > select:nth-child(1) > option:nth-child(3)')
+                                                      'input > select:nth-child(1) > option:nth-child(3)')
             af.click()
             time.sleep(1)
             a1 = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_pm_td_input'
                                                       ' > select:nth-child(1) > option:nth-child(3)')
             a1.click()
-            bf = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:ref_ipe_td_input'
-                                                     ' > input:nth-child(1)')
-            bf.clear()
             cf = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:type_cde_td_input'
-                                                     ' > select:nth-child(1)')
+                                                      ' > select:nth-child(1)')
             cf.click()
             time.sleep(1)
             c1 = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:type_cde_td_input'
                                                       ' > select:nth-child(1) > option:nth-child(1)')
             c1.click()
 
+        time.sleep(1)
+        # Si solo arquetas se deja por defecto GC, si arquetas + poteaux se pone GC et apus aeris
+        select_postes = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:cont_com\/gcblo\:cde_'
+                                                             'concerne > option:nth-child(2)')
+        if solo_arquetas == 'gc+p':
+            select_postes = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:cont_com\/gcblo\:cde_'
+                                                                 'concerne > option:nth-child(4)')
+        elif solo_arquetas == 'p':
+            select_postes = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:cont_com\/gcblo\:cde_'
+                                                                 'concerne > option:nth-child(3)')
+        select_postes.click()
 
         # Fechas de cpl y str
         time.sleep(1)
-        # Si solo arquetas se deja por defecto GC, si no se pone GC et apus aeris
-        if not solo_arquetas:
-            select_postes = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:cont_com\/gcblo\:cde_'
-                                                                 'concerne > option:nth-child(4)')
-            select_postes.click()
-
-        time.sleep(1)
+        diferencial_tipo = 'declaration_trvx'
         if dos_type == 'CPL':
             diferencial_tipo = 'contenu_declaration_travaux'
-        elif dos_type == 'STR':
-            diferencial_tipo = 'declaration_trvx'
 
         form_fecha_ini = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:' + diferencial_tipo + '\/gcblo\:date_debut_trvx')
         form_fecha_fin = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:' + diferencial_tipo + '\/gcblo\:date_fin_trvx_td_input > input:nth-child(1)')
@@ -395,10 +438,20 @@ def boutique_operations(browser, d):
                 add_button = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:' + diferencial_tipo + '\/gcblo\:arteres_princ\[1\]_td_label1 > a:nth-child(1) > img:nth-child(1)')
                 add_button.click()
 
-# TODO recuperar el numero fci
+                # TODO recuperar el numero fci
     fci = 'F4214120316'
     d['fci'] = fci
     b = 1
+
+
+def tsp_operations_1(dosier, ws):
+# operaciones despues de obtener FCI en el tsp
+    ws.Cells(dosier['row'], 40).Value = dosier['fci']
+    fecha_fci = dosier['fci'][-4:-2] + '-' + dosier['fci'][-6:-4] + '-' + dosier['fci'][-2:]
+    ws.Cells(dosier['row'], 41).Value = fecha_fci
+    ws.Cells(dosier['row'], 42).Value = 'DEP'
+    ws.Cells(dosier['row'], 65).Value = 'v1'
+    ws.Cells(dosier['row'], 66).Value = 'Attente Input TFX'
 
 
 #  TODO
@@ -423,7 +476,6 @@ def obtenerFCI():
 
 
     # dosieres de prueba para no tener que cargar el excel continuamente
-    dosieres_act = ['Sus1269', 'Sus1136', 'Sus1314', 'Moe993']
     # dosieres = {
     #             'Sus1314': {'es_aval': True, 'IPE_PM': 'FI-92073-0023', 'ref_1era_PM': 'A DEPOSER', 'date_fin': '18/04/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '28/12/2016', 'nombre': 'Sus1314', 'es_1ca': True, 'cliente': 'SC1', 'tipo': 'STR', 'num_EL': 38},
     #             'Sus1136': {'es_aval': True, 'IPE_PM': 'FI-92073-0017', 'ref_1era_PM': 'F34837031016', 'date_fin': '18/01/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '14/12/2016', 'nombre': 'Sus1136', 'es_1ca': False, 'cliente': 'SC1', 'tipo': 'CPL', 'num_EL': 18},
@@ -433,16 +485,26 @@ def obtenerFCI():
     #             'Sus1230': {'es_aval': True, 'IPE_PM': 'FI-92073-001E', 'ref_1era_PM': 'F28968041116', 'date_fin': '18/01/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '14/12/2016', 'nombre': 'Sus1230', 'es_1ca': True, 'cliente': 'SC1', 'tipo': 'CPL', 'num_EL': 10}
     #
     # }
-
+    dosieres = {
+        'Nee1590': {'formulario': 'SC1_ST_GERMAIN_LAXIS_SPL', 'num_EL': None, 'solo_arquetas': 'gc', 'IPE_PM': None, 'es_aval': False, 'cliente': 'SC1', 'tipo': 'SPL', 'ref_1era_PM': None, 'row': 132, 'calles': ['RUE  BAILLY'], 'date_fin': '02/03/2017', 'ciudad': 'NEUILLY SUR SEINE', 'nombre': 'Nee1590', 'es_1ca': False, 'ref_cli': 'SC1_IMB_92051_C_3178', 'date_ini': '02/02/2017'}
+                }
 
     #  FUNCIONA PARA ACCEDER AL NAS DESDE MI ORDENADOR
     # for cosa in os.listdir('Z:/03-PRODUCCION/0.CAFT/SC1/PRODUCCIÓN/Tab Suivi Prod'):
     #     b = cosa
     #     a = 2
 
+    #TODO probar autocad, autoit, zip files...
+
+    # acad = Autocad.('Fxxxxxxxxxxx_92078_xxxxxx.dxf')
+    # acad.prompt("Hello, Autocad from Python\n")
+    # print(acad.doc.Name)
+    #
+    # pass
+    # b= 1
 
     try:
-        dosieres = cargarDatosExcel(dosieres_act)
+        dosieres = cargarDatosExcel()
     except Exception as ex:
         logging.error('No han podido cargarse los datos del excel porque: %s', ex.msg)
     result = {}
@@ -450,6 +512,7 @@ def obtenerFCI():
     import win32com.client as win32
     import pythoncom
     pythoncom.CoInitialize()
+
     excel = win32.gencache.EnsureDispatch('Excel.Application')
     if os.name == 'nt':
         wb = excel.Workbooks.Open(r'C:\Users\josko\PycharmProjects\josko\SuiviJRU.xlsx')
@@ -457,15 +520,14 @@ def obtenerFCI():
         wb = excel.Workbooks.Open(r'\home\ubuntu\3id2plus\SuiviJRU.xlsx')
     ws = wb.Worksheets('Tab Suivi Prod')
 
-    for d in dosieres_act:
+#TODO cambiar a keys de dosieres antes estaba en dosieres_act
+    for d in dosieres:
         try:
             browser = set_up_browser()
             login(browser)
             boutique_operations(browser, dosieres[d])
             time.sleep(4)
-            ws.Cells(dosieres[d]['row'], 36).Value = dosieres[d]['fci']
-            fecha_fci = dosieres[d]['fci'][-4:-2] + '-' + dosieres[d]['fci'][-6:-4] + '-'  + dosieres[d]['fci'][-2:]
-            ws.Cells(dosieres[d]['row'], 37).Value = fecha_fci
+            tsp_operations_1(dosieres[d], ws)
             # mover_ficheros(dosieres[d])
 
         except Exception as ex:
@@ -483,7 +545,7 @@ def obtenerFCI():
             time.sleep(5)
 
     print('Salvando excel')
-    wb.SaveAs(r'C:\Users\josko\PycharmProjects\josko\SuiviJRU.xlsx')
+    wb.SaveAs(r'C:\Users\josko\PycharmProjects\josko\SuiviJRU2.xlsx')
     excel.Application.Quit()
     return result
 

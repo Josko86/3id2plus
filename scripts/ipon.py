@@ -6,17 +6,206 @@ from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 import time
 import win32com.client
 import win32api, win32con
-import math
 import pythoncom
 
 pythoncom.CoInitialize()
 shell = win32com.client.Dispatch("WScript.Shell")
 INTERVAL = 25
+CTH = 103
+CTW = 2
+WX = 2213
+WY = 274
 
 def win32_click(x, y):
     win32api.SetCursorPos((x, y))
+    time.sleep(1)
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, x, y, 0, 0)
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, x, y, 0, 0)
+
+
+def elem_but_pos(el, repeat_click= True) :
+    loc = el.location
+    size = el.size
+    x = WX + loc['x'] + size['width'] + CTW
+    y = WY + loc['y'] + size['height'] + CTH
+    win32_click(x, y)
+    if repeat_click:
+        win32_click(x, y)
+
+
+def get_data():
+    """
+    proyecto {
+        "id_IMB":
+        "adress_IMB":
+        "IMBs": {
+            "IMB/51454/X/0314": {
+                                "A": {
+                                    "1" : {
+                                        "tipo_material": '[6.i.aco]'
+                                        "material": SI,
+                                        "num_el" 2
+                                        }
+                                    "0": {
+                                        "material": NO,
+                                        "num_el" 1
+                                        }
+                                    },
+                                "B": {
+                                    "2" : {
+                                        "material": NO,
+                                        "num_el" 1
+                                        }
+                                    "1" : {
+                                        "tipo_material": '[6.i.aco]'
+                                        "material": SI,
+                                        "num_el" 1
+                                        }
+                                    "0" : {
+                                        "material": NO,
+                                        "num_el": 3
+                                        }
+                                    }
+                                },
+            "IMB/51454/C/OMM0": {
+                                "C": {
+                                    "2": {
+                                        "material": NO,
+                                        "num_el": 1
+                                        },
+                                    "1": {
+                                        "tipo_material": '[12.i13.3m]'
+                                        "material" SI,
+                                        "num_el": 2
+                                        },
+                                    "0": {
+                                        "material" NO,
+                                        "num_el": 2
+                                        }
+                                }
+            }
+        }
+
+
+
+
+
+    Proyecto por ficha
+        Cada PROYECTO puede tener varios IMB
+            Cada IMB puede tener varios BATIMENT
+                Cada BATIMENT tiene una COLONNE MONTANTE
+                    Cada COLONNE MONTANTE puede tener varios NIVELES
+                        Cada NIVEL tiene:
+                            material: bool
+                            num_el: int
+    :return: proyecto
+    """
+    pythoncom.CoInitialize()
+    excel = win32com.client.gencache.EnsureDispatch('Excel.Application')
+    wb = excel.Workbooks.Open(r'C:\Users\josko\PycharmProjects\josko\cablage.xlsx')
+    excel.Visible = True
+    ws_ic = wb.Worksheets('Infos clés')
+    ws_pb = wb.Worksheets('PB')
+    id_imb = ws_ic.Cells(5, 3).Value
+    adress_imb = ws_ic.Cells(9, 3).Value
+    project = dict()
+    IMBs = dict()
+    PBs = dict()
+    BTIs = dict()
+    #TODO cambiar cuando sea definitive
+    project['nom_project'] = id_imb + '_' + 'josk'
+    # project['nom_project'] = id_imb + '_' + adress_imb
+    row = 6
+    COL_CM = 2
+    COL_MATERIAL = 7
+    COL_EL = 9
+    COL_IMB = 28
+    COL_OBSERVATION = 17
+    COL_CM_IMB = 20
+    COL_TYPE_BTI = 21
+    COL_NIVEL = 3
+    COL_PB_NAME = 15
+    row_imb = 7
+    bti_ini = 1
+
+    while True:   # Una vuelta por cada row de la columna 20
+        cm_imb = ws_pb.Cells(row_imb, COL_CM_IMB)
+        if cm_imb.Value is None:
+            break
+        if cm_imb.Value < 'A':  # Si es un número la columna
+            BTIs[cm_imb.Value]['tipo'] = ws_pb.Cells(row_imb, COL_TYPE_BTI).Value
+        imb = ws_pb.Cells(row_imb, COL_IMB)
+        imb = str(imb)
+        row_imb += 1
+        cm = cm_imb
+        while True:    # Una vuelta por cada row de la columna 2
+            cm = ws_pb.Cells(row, COL_CM)
+            if cm.Value != cm_imb.Value:
+                break
+            cm = str(cm)
+            material = ws_pb.Cells(row, COL_MATERIAL)
+            if material.Value: material = str(material)
+            el = ws_pb.Cells(row, COL_EL)
+            el = str(el)
+            el = el[0:1]
+            nivel = ws_pb.Cells(row, COL_NIVEL)
+            nivel = str(nivel)
+            if nivel == 'RC':
+                nivel = '0'
+            elif len(nivel) > 2:
+                nivel = nivel[:-2]
+            observation = ws_pb.Cells(row, COL_OBSERVATION).Value
+            if observation is None: observation = ""
+            bti = "BTI" in observation
+            hay_material = False
+            if type(material) == str or bti:
+                hay_material = True
+            pb_name = ws_pb.Cells(row, COL_PB_NAME).Value
+            row += 1
+            while True:  #  Una vuelta por cada elemento del nivel (row)
+                if imb in IMBs:
+                    if cm in IMBs[imb]:
+                        if nivel in IMBs[imb][cm]:
+                            IMBs[imb][cm][nivel]['pb_name'] = pb_name
+                            IMBs[imb][cm][nivel]['material'] = hay_material
+                            IMBs[imb][cm][nivel]['num_el'] = el
+                            if pb_name in PBs:
+                                PBs[pb_name]['num_el'] += int(el)
+                                PBs[pb_name]['niveles'].append(nivel)
+                            else:
+                                PBs[pb_name] = {'num_el':int(el), 'colonne':cm, 'niveles':[nivel], 'inmueble': imb}
+
+                            if hay_material:
+                                if bti:
+                                    IMBs[imb][cm][nivel]['observation'] = observation
+                                    BTIs[str(bti_ini)] = {'nivel_is': nivel, 'colonne_is': cm, 'imb_is': imb, 'cms':[], 'observation':observation}
+                                    bti_ini += 1
+                                if type(material) == str:
+                                    IMBs[imb][cm][nivel]['tipo_material'] = material
+                                    PBs[pb_name]['tipo'] = material
+                                    PBs[pb_name]['nivel'] = nivel
+                                    PBs[pb_name]['observation'] = observation
+                            break
+                        else:
+                            IMBs[imb][cm][nivel] = {}
+                    else:
+                        IMBs[imb][cm] = {'bti': ws_pb.Cells(row_imb - 1, 26).Value}
+                        if IMBs[imb][cm]['bti'] == '<na>':
+                            IMBs[imb][cm].pop('bti', None)
+                else:
+                    IMBs[imb] = {}
+    for imb in IMBs:
+        for cm in IMBs[imb]:
+            for bti in BTIs:
+                if bti in IMBs[imb][cm]['bti']:
+                    BTIs[bti]['cms'].append(cm)
+
+    project['inmuebles'] = IMBs
+    project['pbs'] = PBs
+    project['btis'] = BTIs
+    wb.Close(False)
+    excel.Application.Quit()
+    return project
 
 
 def set_up_browser():
@@ -31,6 +220,7 @@ def set_up_browser():
         # profile.accept_untrusted_certs = True
         # browser = webdriver.Firefox(firefox_binary=binary, firefox_profile=profile, capabilities=capabilities)
         # browser.capabilities['acceptSslCerts'] = True
+
         ################################## IE ####################################################
         browser = webdriver.Ie(r'C:\Users\josko\PycharmProjects\josko\scripts\IEDriverServer.exe')
     browser.get('https://lyon.metagate.orange.com/dana/home/index.cgi')
@@ -40,17 +230,22 @@ def set_up_browser():
 def login(browser):
 
     elem = browser.find_element_by_id("username")
-    elem.send_keys("R")
-    shell.SendKeys('{DOWN}', 0)
+    elem.send_keys("L")
+    shell.SendKeys('{DOWN}', 1)
     time.sleep(1)
     shell.SendKeys("{ENTER}", 0)
     elem2 = browser.find_element_by_id("password")
-    # elem2.send_keys("Soge2016*")
+    # elem2.send_keys("Soge2017*")
     time.sleep(1)
     elem2.send_keys(Keys.RETURN)
     time.sleep(2)
     try:
         browser.find_element_by_id('btnContinue').click()
+    except:
+        pass
+    time.sleep(3)
+    try:
+        browser.find_element_by_xpath('/html/body/div/a').click()
     except:
         pass
     time.sleep(10)
@@ -65,10 +260,10 @@ def login(browser):
     time.sleep(1)
     browser.switch_to_window(main_window)
     time.sleep(1)
-    browser.get('http://ipon.sso.francetelecom.fr/NGI/GassiAccess.jsp')
+    browser.get('https://ipon.sso.francetelecom.fr/NGI/GassiAccess.jsp')
     time.sleep(1)
     user_form = browser.find_element_by_id('user')
-    user_form.send_keys('R')
+    user_form.send_keys('L')
     time.sleep(1)
     shell.SendKeys('{DOWN}', 0)
     time.sleep(1)
@@ -77,14 +272,16 @@ def login(browser):
     shell.SendKeys("{TAB}", 0)
     time.sleep(1)
     shell.SendKeys("{TAB}", 0)
-    time.sleep(1)
+    # elem2 = browser.find_element_by_id("password")
+    # elem2.send_keys("Soge2017*")
+    # time.sleep(1)
     shell.SendKeys("{ENTER}", 0)
     time.sleep(3)
-    browser.get('http://ipon.sso.francetelecom.fr/NGI/GassiAccess.jsp')
+    browser.get('https://ipon.sso.francetelecom.fr/NGI/GassiAccess.jsp')
     time.sleep(4)
 
 
-def crear_proyecto_ipon(browser, nra):
+def crear_proyecto_ipon(browser, nra, project):
 
     # Pulsar mon bureau
     browser.get('http://ipon.sso.francetelecom.fr/desktop.jsp')
@@ -92,11 +289,9 @@ def crear_proyecto_ipon(browser, nra):
     nouveau_project = browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/tr/td[2]/a')
     nouveau_project.click()
     time.sleep(3)
-    c5 = 'prue'
-    c9 = 'josko'
     nom = browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[1]/td[2]/input')
     nom.clear()
-    nom.send_keys('_'.join([c5, c9]))
+    nom.send_keys(project['nom_project'])
     code_secteur = browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[5]/td[2]/input')
     code_secteur.clear()
     code_secteur.send_keys(nra)
@@ -107,8 +302,7 @@ def crear_proyecto_ipon(browser, nra):
     time.sleep(2)
 
 
-def estudio(browser, nra):
-
+def select_imb(browser, imbs, inmueble):
     browser.find_element_by_xpath('/html/body/div/div[1]/table/tbody/tr[1]/td/table/tbody/tr/td[3]').click()
     time.sleep(1)
     research_immueble = browser.find_element_by_xpath('/html/body/div/div[1]/table/tbody/tr[1]/td/table/tbody/tr/td[3]/div/ul/li/ul/li[14]/a/span')
@@ -117,9 +311,9 @@ def estudio(browser, nra):
     id_inmuble_form = browser.find_element_by_xpath(
         '/html/body/div[1]/div[1]/div/form[1]/div/table/tbody/tr[2]/td[1]/table/tbody/tr[1]/td/div[1]/table/tbody/tr/td[3]/font/div/input')
     time.sleep(1)
-    id_inmuble_form.send_keys("I")
-    shell.SendKeys('{DOWN}', 0)  # Elegir el imnmueble
-    time.sleep(1)
+    id_inmuble_form.send_keys('I')
+    # shell.SendKeys('{DOWN}', 0)  # Elegir el imnmueble
+    # time.sleep(1)
     shell.SendKeys('{DOWN}', 0)
     time.sleep(1)
     shell.SendKeys("{ENTER}", 0)
@@ -128,7 +322,9 @@ def estudio(browser, nra):
     time.sleep(6)
     browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form[2]/table/tbody/tr/td/div[1]/table/tbody/tr/td[2]/a').click()
     time.sleep(3)
-    """
+
+
+def estudio(browser, nra, imbs, inmueble):
     # modifier IMB
     browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[1]/tbody/tr/td[2]/a').click()
     time.sleep(3)
@@ -168,98 +364,399 @@ def estudio(browser, nra):
     # mettre a jours (save)
     browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[1]/tbody/tr/td[2]/a').click()
     time.sleep(2)
-    """
+
+    pass
+def consulter_metre(browser, imbs, inmueble):
     # consulter metre la jour
     browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[1]/tbody/tr/td[4]/a').click()
     time.sleep(3)
-    # browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]/td/form/table[2]/tbody/tr/td/table[1]/tbody/tr/td/table/tbody/tr/td[10]/font/a[2]').click()
-    # time.sleep(2)
-    # browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/form/table/tbody/tr[3]/td/font/div[1]/a').click()
-    # time.sleep(3)
-    browser.set_window_position(2213, 274)
-    browser.set_window_size(1700, 1100)
-    shell.SendKeys("{F12}", 0)
-    time.sleep(6)
-    win32_click(2397, 757)
-    time.sleep(1)
-    # win32_click(2890, 556)
-    # time.sleep(1)
-    # for i in range(4):
-    #     shell.SendKeys('{UP}', 0)
-    #     time.sleep(1)
-    # shell.SendKeys('{DOWN}', 0)
-    # time.sleep(1)
-    # shell.SendKeys("{ENTER}", 0)
-    # time.sleep(1)
-    # win32_click(2994, 555)
-    # time.sleep(1)
-    # for i in range(4):
-    #     shell.SendKeys('{DOWN}', 0)
-    #     time.sleep(1)
-    # shell.SendKeys('{UP}', 0)
-    # time.sleep(1)
-    # shell.SendKeys("{ENTER}", 0)
-    # time.sleep(2)
-    # # click sauvegarder
-    # browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]/td/form/'
-    #                               'table[2]/tbody/tr/td/table[1]/tbody/tr/td/table/tbody/tr/td[2]/font/a[2]').click()
-    # time.sleep(3)
-    # # click [no name]
-    browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]/td/form/tabl'
-                                  'e[2]/tbody/tr/td/table[2]/tbody/tr/td/div/table/tbody/tr/td[2]/div/a').click()
-    time.sleep(1)
-    # click nouvel escalier
-    browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[4]/td/form/'
-                                  'table[2]/tbody/tr/td/table[1]/tbody/tr/td/table/tbody/tr/td[5]/font/a[2]').click()
-    time.sleep(2)
-    browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/form/table/tbody/tr[5]/'
-                                  'td/font/div[1]/a').click()
-    time.sleep(3)
-    # click nouveau niveau
-    browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]/td/form/'
-                                  'table[2]/tbody/tr/td/table[1]/tbody/tr/td/table/tbody/tr/td[5]/font/a[2]').click()
-    nombre_form = browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/form/table/tbody/tr[1]/td[2]/font/input')
-    nombre_form.clear()
-    nombre_form.send_keys('3')
-    apartirde_form = browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/form/table/tbody/tr[2]/td[2]/font/input')
-    apartirde_form.clear()
-    apartirde_form.send_keys('0')
-    time.sleep(1)
-    browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/form/table/tbody/tr[4]/td/font/div[1]/a').click()
-    time.sleep(4)
-    # type de lescalier
-    win32api.SetCursorPos(3176,1084)
-    time.sleep(1)
-    win32_click(3176,1084)
-    time.sleep(1)
-    shell.SendKeys('{DOWN}', 0)
-    time.sleep(1)
-    shell.SendKeys('{DOWN}', 0)
-    time.sleep(1)
-    shell.SendKeys("{ENTER}", 0)
-    time.sleep(2)
-    browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[4]/td/form/table[2]/tbody/tr/td/table[1]/tbody/tr/td/table/tbody/tr/td[2]/font/a[2]').click()
-    time.sleep(3)
-    # Conexiones de cada piso
-    y= 547
-    for i in range(3): #Numero de niveles
-        win32_click(2700, y)
+
+    for batiment in imbs[inmueble].keys():
+        # creer batiment
+        browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]/td/form/table[2]/tbody/tr/td/table[1]/tbody/tr/td/table/tbody/tr/td[10]/font/a[2]').click()
         time.sleep(2)
-        shell.SendKeys('2', 0)
+        browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/form/table/tbody/tr[3]/td/font/div[1]/a').click()
+        time.sleep(3)
+        browser.set_window_position(WX, WY)
+        browser.set_window_size(1700, 1100)
+        shell.SendKeys("{F12}", 0)
+        time.sleep(6)
+        win32_click(2397, 757)
+        time.sleep(2)
+        type_batiment = browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]'
+                                      '/td/form/table[2]/tbody/tr/td/table[2]/tbody/tr/td/div/table/tbody/tr/td[6]/div')
+        elem_but_pos(type_batiment)
+
+        time.sleep(1)
+        for i in range(4):
+            shell.SendKeys('{UP}', 0)
+            time.sleep(1)
+        shell.SendKeys('{DOWN}', 0)
+        time.sleep(1)
+        shell.SendKeys("{ENTER}", 0)
+        time.sleep(1)
+        etat_batiment = browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]'
+                                                      '/td/form/table[2]/tbody/tr/td/table[2]/tbody/tr/td/div/table/tbody/tr/td[7]/div')
+        elem_but_pos(etat_batiment)
+        time.sleep(1)
+        for i in range(4):
+            shell.SendKeys('{DOWN}', 0)
+            time.sleep(1)
+        shell.SendKeys('{UP}', 0)
         time.sleep(1)
         shell.SendKeys("{ENTER}", 0)
         time.sleep(2)
-        y = y + INTERVAL
+        # click sauvegarder
+        browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]/td/form/'
+                                      'table[2]/tbody/tr/td/table[1]/tbody/tr/td/table/tbody/tr/td[2]/font/a[2]').click()
+        time.sleep(5)
+        # click [no name]
+        browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]/td/form/tabl'
+                                      'e[2]/tbody/tr/td/table[2]/tbody/tr/td/div/table/tbody/tr/td[2]/div/a').click()
+        time.sleep(2)
+        # click nouvel escalier
+        browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[4]/td/form/'
+                                      'table[2]/tbody/tr/td/table[1]/tbody/tr/td/table/tbody/tr/td[5]/font/a[2]').click()
+        time.sleep(2)
+        browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/form/table/tbody/tr[5]/'
+                                      'td/font/div[1]/a').click()
+        time.sleep(3)
+        # click nouveau niveau
+        browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]/td/form/'
+                                      'table[2]/tbody/tr/td/table[1]/tbody/tr/td/table/tbody/tr/td[5]/font/a[2]').click()
+        nombre_form = browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/form/table/tbody/tr[1]/td[2]/font/input')
+        nombre_form.clear()
+        # #TODO: meter el batiment que corresponda
+        niveles = imbs[inmueble][batiment].keys()
+        num_niveles = len(niveles) - 1
+        lista_niveles = []
+        for nivel in niveles:
+            if nivel != 'bti':
+                lista_niveles.append(int(nivel))
+        sorted_niveles = sorted(lista_niveles)
+        nombre_form.send_keys(str(num_niveles))
+        apartirde_form = browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/form/table/tbody/tr[2]/td[2]/font/input')
+        apartirde_form.clear()
+        apartirde_form.send_keys(str(sorted(lista_niveles)[0]))
+        time.sleep(1)
+        browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/form/table/tbody/tr[4]/td/font/div[1]/a').click()
+        time.sleep(4)
+        # type de lescalier
+        browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[4]/td/form/table[2]/tbody/tr/td/table[1]/tbody/tr/td/table/tbody/tr/td[2]/font/a[2]').click()
+        time.sleep(3)
+        type_lescalier = browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/'
+                                                       'tbody/tr[4]/td/form/table[2]/tbody/tr/td/table[2]/tbody/tr/td/div/table/tbody/tr/td[4]/div')
+        elem_but_pos(type_lescalier, False)
+        time.sleep(1)
+        shell.SendKeys('{DOWN}', 0)
+        time.sleep(1)
+        shell.SendKeys('{DOWN}', 0)
+        time.sleep(1)
+        shell.SendKeys("{ENTER}", 0)
+        time.sleep(2)
+        browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[4]/td/form/table[2]/tbody/tr/td/table[1]/tbody/tr/td/table/tbody/tr/td[2]/font/a[2]').click()
+        time.sleep(3)
+
+        #TODO cambiar 0 en el nombre de nivel por RCD COMPROBAR!!!!!
+        browser.find_element_by_xpath(
+            '/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]/td/form/table[2]/tbody/tr/td/table[1]/tbody/tr/td/table/tbody/tr/td[2]/font/a[2]').click()
+        i = 1
+        time.sleep(1)
+        for nivel in sorted_niveles:
+            time.sleep(1)
+            if nivel == 0:
+                nom_nivel = browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/'
+                                                          'tr[1]/td/form/table[2]/tbody/tr/td/table[2]/tbody/tr/td/div/table/tbody/tr[' + str(i) + ']/td[2]/div')
+                elem_but_pos(nom_nivel)
+                time.sleep(2)
+                shell.Sendkeys("{LEFT}", 0)
+                shell.Sendkeys("{DELETE}", 0)
+                shell.SendKeys("RCD", 0)
+                time.sleep(1)
+                shell.SendKeys("{ENTER}", 0)
+            i += 1
+
+        # Conexiones de cada piso
+        browser.find_element_by_xpath(
+            '/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]/td/form/table[2]/tbody/tr/td/table[1]/tbody/tr/td/table/tbody/tr/td[2]/font/a[2]').click()
+        time.sleep(4)
+        i = 1
+        for nivel in sorted_niveles: #Numero de niveles
+            time.sleep(1)
+            num_conexiones = browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]/td/form/table[2]/tbody/tr/td/table[2]/tbody/tr/td/div/table/tbody/tr[' + str(i) + ']/td[4]/div')
+            elem_but_pos(num_conexiones)
+            time.sleep(2)
+            shell.SendKeys(imbs[inmueble][batiment][str(nivel)]['num_el'], 0)
+            time.sleep(1)
+            shell.SendKeys("{ENTER}", 0)
+            time.sleep(2)
+            i += 1
+        i = 1
+        browser.find_element_by_xpath(
+            '/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]/td/form/table[2]/tbody/tr/td/table[1]/tbody/tr/td/table/tbody/tr/td[2]/font/a[2]').click()
+        time.sleep(4)
+        for nivel in sorted_niveles: #Numero de niveles
+
+            time.sleep(1)
+            type_level = browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]/td/form/table[2]/tbody/tr/td/table[2]/tbody/tr/td/div/table/tbody/tr[' + str(i) + ']/td[6]/div')
+            elem_but_pos(type_level,False)
+            time.sleep(2)
+            if imbs[inmueble][batiment][str(nivel)]['num_el'] != '0' or imbs[inmueble][batiment][str(nivel)]['material']:
+                shell.SendKeys('{DOWN}', 0)
+                time.sleep(1)
+                if imbs[inmueble][batiment][str(nivel)]['material']:
+                    shell.SendKeys('{DOWN}', 0)
+                    time.sleep(1)
+                    shell.SendKeys('{DOWN}', 0)
+                    time.sleep(1)
+                    if imbs[inmueble][batiment][str(nivel)]['num_el'] == '0':
+                        shell.SendKeys('{DOWN}', 0)
+                        time.sleep(1)
+            shell.SendKeys("{ENTER}", 0)
+            time.sleep(2)
+            i += 1
+        time.sleep(2)
+        # guardar
+        browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]/td/form/table[2]/tbody/tr/td/table[1]/tbody/tr/td/table/tbody/tr/td[2]/font/a[2]').click()
+        time.sleep(4)
+        browser.find_element_by_xpath('/html/body/table[2]/tbody/tr/td[2]/table/tbody/tr[1]/td/div/a[6]').click()
+        time.sleep(3)
+        browser.find_element_by_xpath('/html/body/table[2]/tbody/tr/td[2]/table/tbody/tr[2]/td/p/nobr[3]/a').click()
+        time.sleep(3)
+        # crear acces
+        browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[2]/td/form/table[2]/tbody/tr/td/table[1]/tbody/tr/td/table/tbody/tr/td[5]/font/a[2]').click()
+        time.sleep(2)
+        #crear contact
+        browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[3]/td/form/table[2]/tbody/tr/td/table[1]/tbody/tr/td/table/tbody/tr/td[5]/font/a[2]').click()
+        time.sleep(2)
+        browser.find_element_by_xpath('/html/body/table[2]/tbody/tr/td[2]/table/tbody/tr[1]/td/div/a[6]').click()
+        time.sleep(3)
+        browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]/td/form/table[2]/tbody/tr/td/table[2]/tbody/tr/td/div/table/tbody/tr/td[2]/div/a').click()
+        time.sleep(3)
+        browser.find_element_by_xpath('/html/body/table[2]/tbody/tr/td[2]/table/tbody/tr[2]/td/p/nobr[2]/a').click()
+        time.sleep(3)
+        type_access = browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]/td/form/'
+                                      'table[2]/tbody/tr/td/table[2]/tbody/tr/td/div/table/tbody/tr/td[9]/div')
+        elem_but_pos(type_access)
+        time.sleep(3)
+        shell.SendKeys('{DOWN}', 0)
+        time.sleep(1)
+        shell.SendKeys('{DOWN}', 0)
+        time.sleep(1)
+        shell.SendKeys("{ENTER}", 0)
+        time.sleep(2)
+        browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]/td/form/table[2]/tbody/tr/td/table[1]/tbody/tr/td/table/tbody/tr/td[2]/font/a[2]').click()
+    time.sleep(3)
 
 
+def crear_pb(browser, imbs, inmueble, pbs, btis):
+    for pb in pbs:
+        if pbs[pb]['inmueble'] == inmueble:
+            browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form[2]/table/tbody/tr/td/table/tbody/tr/td[5]/a').click()
+            time.sleep(2)
+            rechercher_button = browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[5]/td/div[2]/div/a')
+            rechercher_button.click()
+            time.sleep(1)
+            select_modele = browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/'
+                                                          'td/table/tbody/tr[6]/td[2]/select').click()
+            if pbs[pb]['tipo'] == '[6.i.aco]':
+                selection_modele = browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/'
+                                                                 'table/tbody/tr[6]/td[2]/select/option[12]').click()
+            if pbs[pb]['tipo'] == '[12.i13.3m]':
+                selection_modele = browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table/tbody/tr/td/'
+                                                                     'table/tbody/tr[6]/td[2]/select/option[5]').click()
+            time.sleep(1)
+            # click creer
+            browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[17]/td/div[1]/div/a').click()
+            #TODO hacer lo de añadir mas cassetes si es necesario
+            time.sleep(3)
+            browser.find_element_by_xpath('/html/body/div[1]/div[1]/table/tbody/tr[3]/td/table/tbody/tr/td/div[4]/table/tbody/tr/td[2]/a').click()
+            time.sleep(2)
+            browser.find_element_by_xpath('/html/body/div/div[1]/div/div[3]/form/table/tbody/tr/td/table[1]/tbody/tr/td[2]/a').click()
+            time.sleep(2)
+            #Hauteur par rapport au sol
+            browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[15]/td[2]/select').click()
+            browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[15]/td[2]/select/option[2]').click()
+            #Position lequipament
+            time.sleep(1)
+            browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[16]/td[2]/select').click()
+            if '3M (GT)' in pbs[pb]['observation']:
+                browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]'
+                                              '/tbody/tr[16]/td[2]/select/option[10]').click()
+            else:
+                browser.find_element_by_xpath(
+                    '/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[16]/td[2]/select'
+                    '/option[6]').click()
+            time.sleep(1)
+            browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[1]/tbody/tr/td[2]/a').click()
+            # Volver al inmueble
+            time.sleep(2)
+            browser.find_element_by_xpath('/html/body/div/div[1]/table/tbody/tr[3]/td/div/div/a[7]').click()
+            time.sleep(2)
+
+    for bti in btis:
+        if btis[bti]['imb_is'] == inmueble:
+            browser.find_element_by_xpath(
+                '/html/body/div[1]/div[1]/div/form[2]/table/tbody/tr/td/table/tbody/tr/td[5]/a').click()
+            time.sleep(2)
+            rechercher_button = browser.find_element_by_xpath(
+                '/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[5]/td/div[2]/div/a')
+            rechercher_button.click()
+            time.sleep(1)
+            select_modele = browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/'
+                                                          'td/table/tbody/tr[6]/td[2]/select').click()
+            if btis[bti]['tipo'] == 'BTI 36':
+                selection_modele = browser.find_element_by_xpath(
+                    '/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[6]/td[2]/select/option[19]').click()
+            if btis[bti]['tipo'] == 'BTI 144':
+                selection_modele = browser.find_element_by_xpath(
+                    '/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[6]/td[2]/select/option[21]').click()
+            time.sleep(1)
+            # click creer
+            browser.find_element_by_xpath(
+                '/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[17]/td/div[1]/div/a').click()
+            # TODO hacer lo de añadir mas cassetes si es necesario
+            time.sleep(3)
+            browser.find_element_by_xpath(
+                '/html/body/div[1]/div[1]/table/tbody/tr[3]/td/table/tbody/tr/td/div[4]/table/tbody/tr/td[2]/a').click()
+            time.sleep(2)
+            browser.find_element_by_xpath(
+                '/html/body/div/div[1]/div/div[3]/form/table/tbody/tr/td/table[1]/tbody/tr/td[2]/a').click()
+            time.sleep(2)
+            # Hauteur par rapport au sol
+            browser.find_element_by_xpath(
+                '/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[15]/td[2]/select').click()
+            browser.find_element_by_xpath(
+                '/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[15]/td[2]/select/option[2]').click()
+            # Position lequipament
+            time.sleep(1)
+            browser.find_element_by_xpath(
+                '/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[16]/td[2]/select').click()
+            if '36 (GT)' in pbs[pb]['observation'] or '144 (GT)' in pbs[pb]['observation']:
+                browser.find_element_by_xpath(
+                    '/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]'
+                    '/tbody/tr[16]/td[2]/select/option[10]').click()
+            else:
+                browser.find_element_by_xpath(
+                    '/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[16]/td[2]/select'
+                    '/option[6]').click()
+            time.sleep(1)
+            browser.find_element_by_xpath(
+                '/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[1]/tbody/tr/td[2]/a').click()
+            # Volver al inmueble
+            time.sleep(2)
+            browser.find_element_by_xpath('/html/body/div/div[1]/table/tbody/tr[3]/td/div/div/a[7]').click()
+            time.sleep(2)
+
+    for pb in pbs:
+        if pbs[pb]['inmueble'] == inmueble:
+            #CH 01573 de ejemplo luego se pillará de un excel
+            browser.find_element_by_xpath('/html/body/div/div[1]/table/tbody/tr[1]/td/table/tbody/tr/td[3]').click()
+            time.sleep(1)
+            rechercher_chambre = browser.find_element_by_xpath('/html/body/div[1]/div[1]/table/tbody/tr[1]/td/table/'
+                                                               'tbody/tr/td[3]/div/ul/li/ul/li[16]/a/span')
+            rechercher_chambre.click()
+            time.sleep(2)
+            input_chambre = browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form[1]/div/table/tbody/tr[2]/'
+                                                          'td[1]/table/tbody/tr[3]/td/div/table/tbody/tr/td[3]/font/span/input')
+            chambre_code = '01573'
+            pt_code = 'PT 1394'
+            time.sleep(1)
+            input_chambre.send_keys(chambre_code)
+            shell.SendKeys("{ENTER}", 0)
+            time.sleep(4)
+            insee = inmueble.split('/')[1]
+            identifiant = chambre_code + '/' + insee
+            row_ch = browser.find_element_by_xpath("//*[contains(text(), '" + identifiant + "')]")
+            row_parent = row_ch.find_element_by_xpath('..')
+            ch = row_parent.find_element_by_xpath('td[2]').click()
+            time.sleep(2)
+            pt_selected = browser.find_element_by_xpath("//*[contains(text(), '" + pt_code + "')]")
+            row_parent2 = pt_selected.find_element_by_xpath('../..')
+            pa_selected = row_parent2.find_element_by_xpath('td[4]/a').click()
+            time.sleep(2)
+            creer_point = browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/'
+                                                        'tr/td[2]/a').click()
+            time.sleep(1)
+            main_window = browser.current_window_handle
+            mas1 = browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table[1]/tbody/tr/td/table/thead/t'
+                                                 'r[4]/td[2]/b[1]/a').click()
+            time.sleep(4)
+            signin_window_handle = browser.window_handles[1]
+            time.sleep(1)
+            browser.switch_to.window(signin_window_handle)
+            frame1 = browser.find_element_by_xpath('/html/frameset/frame[1]')
+            frame2 = browser.find_element_by_xpath('/html/frameset/frame[2]')
+            browser.switch_to_frame(frame1)
+            # Seleccionar inmueble
+            browser.find_element_by_xpath('/html/body/div[1]/div/table/tbody/tr[1]/td/table/tbody/tr/td[3]/div/ul/li/div/form/input[1]').click()
+            time.sleep(1)
+            research_inmueble = browser.find_element_by_xpath('/html/body/div[1]/div/table/tbody/tr[1]/td/table/tbody/tr/td[3]/div/ul/li/ul/li[14]/a')
+            research_inmueble.click()
+            time.sleep(1)
+            id_inmuble_form = browser.find_element_by_xpath(
+                '/html/body/div[1]/div/div/form[1]/div/table/tbody/tr[2]/td[1]/table/tbody/tr[1]/td/div[1]/table/tbody/tr/td[3]/font/div/input')
+            time.sleep(1)
+            id_inmuble_form.send_keys('I')
+            shell.SendKeys('{DOWN}', 0)
+            time.sleep(1)
+            shell.SendKeys("{ENTER}", 0)
+            time.sleep(1)
+            shell.SendKeys("{ENTER}", 0)
+            time.sleep(8)
+            browser.find_element_by_xpath(
+                '/html/body/div[1]/div/div/form[2]/table/tbody/tr/td/div[1]/table/tbody/tr/td[1]/input').click()
+            time.sleep(1)
+            browser.switch_to_default_content()
+            time.sleep(1)
+            browser.switch_to_frame(frame2)
+            time.sleep(1)
+            browser.find_element_by_xpath('/html/body/form/div[1]/div/a').click()
+            time.sleep(2)
+            browser.switch_to_window(main_window)
+            time.sleep(1)
+            main_window = browser.current_window_handle
+            mas2 = browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table[1]/tbody/tr/td/table/thead/tr'
+                                                 '[5]/td[2]/b[1]/a').click()
+            time.sleep(4)
+            signin_window_handle = browser.window_handles[1]
+            browser.switch_to.window(signin_window_handle)
+            time.sleep(1)
+            frame1 = browser.find_element_by_xpath('/html/frameset/frame[1]')
+            frame2 = browser.find_element_by_xpath('/html/frameset/frame[2]')
+            browser.switch_to_frame(frame1)
+            i = 2
+            for k in range(1):
+                browser.find_element_by_xpath('/html/body/div/div/div/form/table/tbody/tr[2]/td/table/tbody/tr[' + str(i) + ']/td[1]/input').click()
+                time.sleep(1)
+                i += 1
+            time.sleep(1)
+            browser.switch_to_default_content()
+            time.sleep(1)
+            browser.switch_to_frame(frame2)
+            browser.find_element_by_xpath('/html/body/form/div[1]/div/a').click()
+            time.sleep(2)
+            browser.switch_to_window(main_window)
+            browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table[2]/tbody/tr/td/a[1]').click()
+
+def crear_cables(browser, imbs, inmueble, pbs, btis):
     pass
 
-
 def ejecutar_ipon(nra):
+
+    project = get_data()
+    imbs = project ['inmuebles']
+    pbs = project ['pbs']
+    btis = project ['btis']
     browser = set_up_browser()
     login(browser)
-    # crear_proyecto_ipon(browser, nra)
-    estudio(browser, nra)
+    # crear_proyecto_ipon(browser, nra, project)
+    for inmueble in imbs.keys():
+        select_imb(browser, imbs, inmueble)
+        # estudio(browser, nra, imbs, inmueble)
+        # consulter_metre(browser, imbs, inmueble)
+        crear_pb(browser, imbs, inmueble, pbs, btis)
+        crear_cables(browser, imbs, inmueble, pbs, btis)
 
 
 # ejecutar_ipon()
