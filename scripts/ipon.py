@@ -7,6 +7,7 @@ import time
 import win32com.client
 import win32api, win32con
 import pythoncom
+import openpyxl
 
 pythoncom.CoInitialize()
 shell = win32com.client.Dispatch("WScript.Shell")
@@ -102,7 +103,7 @@ def get_data():
     """
     pythoncom.CoInitialize()
     excel = win32com.client.gencache.EnsureDispatch('Excel.Application')
-    wb = excel.Workbooks.Open(r'C:\Users\josko\PycharmProjects\josko\cablage.xlsx')
+    wb = excel.Workbooks.Open(r'C:\Users\josko\PycharmProjects\josko\inmueble_prueba6.xls')
     excel.Visible = True
     ws_ic = wb.Worksheets('Infos clés')
     ws_pb = wb.Worksheets('PB')
@@ -112,6 +113,7 @@ def get_data():
     IMBs = dict()
     PBs = dict()
     BTIs = dict()
+    cables = []
     #TODO cambiar cuando sea definitive
     project['nom_project'] = id_imb + '_' + 'josk'
     # project['nom_project'] = id_imb + '_' + adress_imb
@@ -203,6 +205,22 @@ def get_data():
     project['inmuebles'] = IMBs
     project['pbs'] = PBs
     project['btis'] = BTIs
+    wb.Close(False)
+    wb = excel.Workbooks.Open(r'C:\Users\josko\PycharmProjects\josko\cablage6.xlsx')
+    excel.Visible = True
+    sheet = wb.Worksheets(1)
+    canvas = sheet.Shapes
+    for shp in canvas:
+        box = shp.TextFrame2.TextRange.Characters.Text
+        if 'CH ' in box and 'PA' in box:
+            project['pa_chambre'] = box[-5:]
+            project['pa_pt'] = box[-15:-9]
+
+    for shp in canvas:
+        box = shp.TextFrame2.TextRange.Characters.Text
+        if 'TR ' in box:
+            cables.append(box)
+    project['cables'] = cables
     wb.Close(False)
     excel.Application.Quit()
     return project
@@ -550,6 +568,13 @@ def consulter_metre(browser, imbs, inmueble):
 
 
 def crear_pb(browser, imbs, inmueble, pbs, btis):
+    pythoncom.CoInitialize()
+    excel = win32com.client.gencache.EnsureDispatch('Excel.Application')
+    wb = excel.Workbooks.Open(r'C:\Users\josko\PycharmProjects\josko\cablage6.xlsx')
+    excel.Visible = True
+    sheet = wb.Worksheets(1)
+    canvas = sheet.Shapes
+    time.sleep(5)
     for pb in pbs:
         if pbs[pb]['inmueble'] == inmueble:
             browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form[2]/table/tbody/tr/td/table/tbody/tr/td[5]/a').click()
@@ -574,6 +599,13 @@ def crear_pb(browser, imbs, inmueble, pbs, btis):
             time.sleep(2)
             browser.find_element_by_xpath('/html/body/div/div[1]/div/div[3]/form/table/tbody/tr/td/table[1]/tbody/tr/td[2]/a').click()
             time.sleep(2)
+            pt_value = browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table'
+                                                     '[2]/tbody/tr[1]/td[2]/input').get_attribute('value')
+            for shp in canvas:
+                box = shp.TextFrame2.TextRange.Characters.Text
+                if 'PT ' + pb in box:
+                    shp.TextFrame2.TextRange.Characters.Text = pt_value
+
             #Hauteur par rapport au sol
             browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[15]/td[2]/select').click()
             browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[15]/td[2]/select/option[2]').click()
@@ -623,6 +655,16 @@ def crear_pb(browser, imbs, inmueble, pbs, btis):
             browser.find_element_by_xpath(
                 '/html/body/div/div[1]/div/div[3]/form/table/tbody/tr/td/table[1]/tbody/tr/td[2]/a').click()
             time.sleep(2)
+            pt_value = browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table'
+                                                     '[2]/tbody/tr[1]/td[2]/input').get_attribute('value')
+            pt_split = pt_value.split(sep=' ')
+            pt_value = pt_split[1]
+            for shp in canvas:
+                box = shp.TextFrame2.TextRange.Characters.Text
+                if 'bti' + bti in box and 'BTI ' in box:
+                    box = box.replace('bti'+bti, pt_value)
+                    shp.TextFrame2.TextRange.Characters.Text = box
+
             # Hauteur par rapport au sol
             browser.find_element_by_xpath(
                 '/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[15]/td[2]/select').click()
@@ -756,7 +798,7 @@ def ejecutar_ipon(nra):
         # estudio(browser, nra, imbs, inmueble)
         # consulter_metre(browser, imbs, inmueble)
         crear_pb(browser, imbs, inmueble, pbs, btis)
-        crear_cables(browser, imbs, inmueble, pbs, btis)
+        # crear_cables(browser, imbs, inmueble, pbs, btis)
 
 
 # ejecutar_ipon()
