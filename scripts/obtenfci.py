@@ -59,10 +59,10 @@ def calculoArquetas(row, hp):
 
 def calculoNumel(row,hp):
     global num_el
-    if hp.cell(row=row, column=713).value == None:
+    if hp.cell(row=row, column=727).value == None:
         num_el = '0'
     else:
-        a = hp.cell(row=row, column=713).value
+        a = hp.cell(row=row, column=727).value
         num_el = str(a)
     return num_el
 
@@ -80,6 +80,18 @@ def calculoCalles(row,hp):
     return calles
 
 
+def calculoFormulario(ciudad, tp, hf):
+    global formulario
+    for row in hf.iter_rows(min_row=1, max_col=1, max_row=hf.max_row):
+        for celda in row:
+            if celda.value == ciudad:
+                column = 9
+                if tp == 'CPL': column = 10
+                elif tp == 'STR': column = 11
+                formulario = hf.cell(row=celda.row, column=column).value
+    return  formulario
+
+
 def cargarDatosExcel():
 # Carga de todos los datos necesarios del excel y los mete en un diccionario de dosieres
     print('Carga de todos los datos necesarios del excel y los mete en un diccionario de dosieres')
@@ -94,13 +106,21 @@ def cargarDatosExcel():
         # doc = openpyxl.load_workbook(r'/home/ubuntu/nas/NAS/03-PRODUCCION/0.CAFT/SC1/PRODUCCIÓN/Tab Suivi Prod/suivi prod general SC1 practica-JRU.xlsx', data_only=True)
     doc.get_sheet_names()
     hoja_principal = doc.get_sheet_by_name('Tab Suivi Prod')
+    hoja_formulario = doc.get_sheet_by_name('DEX & PIT')
     dosieres = dict()
+
 
     for row in hoja_principal.iter_rows(min_row=1, max_col=1, max_row=hoja_principal.max_row):
         for celda in row:
+            sacar_fci_simple = hoja_principal.cell(row=celda.row, column=20).value == 'SIMPLE' and\
+                               hoja_principal.cell(row=celda.row, column=40).value == None and celda.row != 1565
+            sacar_fci_cplstr = (hoja_principal.cell(row=celda.row, column=20).value == 'COMPLEXE' or
+                                hoja_principal.cell(row=celda.row, column=20).value == 'STRUCTURANTE') \
+                               and hoja_principal.cell(row=celda.row, column=40).value == None and \
+                               hoja_principal.cell(row=celda.row, column=50).value == 'CTRL OK'
             #TODO if celda.value in dosieres_act:  -->  Para seleccionar los dosieres que se hacen
-            if hoja_principal.cell(row=celda.row, column=20).value == 'SIMPLE' and \
-                            hoja_principal.cell(row=celda.row, column=40).value == None and celda.row != 1565:
+            if  sacar_fci_cplstr or sacar_fci_simple:
+#                   formulario en pestaña dex & pit y el numero fi aax   y 727 para la capacidad el
                 dosier = {
                     'nombre': celda.value,
                     'ciudad': hoja_principal.cell(row= celda.row, column= 16).value,
@@ -108,19 +128,19 @@ def cargarDatosExcel():
                     'tipo': calculoTipo(celda.row, hoja_principal),
                     'es_1ca': hoja_principal.cell(row= celda.row, column=19).value == '1er CA',
                     'IPE_PM': hoja_principal.cell(row= celda.row, column= 8).value,
-                    'ref_1era_PM': hoja_principal.cell(row= celda.row, column= 15).value,
+                    'ref_1era_PM': hoja_principal.cell(row= celda.row, column= 726).value,
                     'num_EL': calculoNumel(celda.row, hoja_principal),
                     'cliente': 'SC1',
                     'solo_arquetas': calculoArquetas(celda.row, hoja_principal), # gc, gc+p, p
                     'calles': calculoCalles(celda.row, hoja_principal),
                     'ref_cli': hoja_principal.cell(row= celda.row, column=79).value,
-                    'formulario': 'SC1_ST_GERMAIN_LAXIS_SPL', #TODO poner la columna que ponga el nombre del form
                     'row': celda.row
                 }
+                dosier ['formulario'] = calculoFormulario(dosier['ciudad'], dosier['tipo'], hoja_formulario)
                 dosier['date_ini'] = calculoFechas(dosier['tipo'], 4, hoja_principal)
                 dosier['date_fin'] = calculoFechas(dosier['tipo'], 5, hoja_principal)
                 dosieres[dosier['nombre']] = dosier
-    # doc.save('SuiviJRU.xlsx')
+    doc = None
     return dosieres
 
 ############################################ EJEMPLO DOSIER ###########################
@@ -246,6 +266,7 @@ def boutique_operations(browser, d):
     solo_arquetas = d['solo_arquetas']
     fecha_ini = d['date_ini']
     fecha_fin = d['date_fin']
+    ref_cli = d['ref_cli']
     calles = d['calles']
     # Si esta en phantomjs tiene que entrar en el iframe
     if browser.name == 'phantomjs':
@@ -268,6 +289,8 @@ def boutique_operations(browser, d):
         time.sleep(1)
         if es_aval:
             #opción marcada por defecto. No modificar el select, solo los 2 campos siguientes
+            browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_pm_td_input'
+                                                 ' > select:nth-child(1) > option:nth-child(1)').click()
             aval_choice = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde'
                                                                '_pm_td_input > select:nth-child(1) > option:nth-child(3)')
             aval_choice.click()
@@ -276,14 +299,15 @@ def boutique_operations(browser, d):
 
         elif not es_aval:
             time.sleep(1)
+            browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_'
+                                                 'pm_td_input > select:nth-child(1) > option:nth-child(1)').click()
             amont_choice = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_'
                                                                 'pm_td_input > select:nth-child(1) > option:nth-child(2)')
-            amont_choice.click()
-            browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_'
-                                                 'pm_td_input > select:nth-child(1) > option:nth-child(2)').click()
+            amont_choice.click()#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_pm_td_input > select:nth-child(1) > option:nth-child(2)
 
         time.sleep(2)
-
+        browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:cont_com\/gcblo\:cde_'
+                                             'concerne > option:nth-child(1)').click()
         # Si solo arquetas se deja por defecto GC, si arquetas + poteaux se pone GC et apus aeris
         select_postes = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:cont_com\/gcblo\:cde_'
                                                              'concerne > option:nth-child(2)')
@@ -339,9 +363,16 @@ def boutique_operations(browser, d):
                                                   ' > input:nth-child(1)')
         df.clear()
         time.sleep(1)
+        browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:cab_mixte_td_input > '
+                                             'select:nth-child(1) > option:nth-child(1)').click()
         ff = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:ref_cde_aval_pm_td_'
                                                   'input > input:nth-child(1)')
         ff.clear()
+        time.sleep(1)
+        browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:type_cde_td_input'
+                                             ' > select:nth-child(1) > option:nth-child(1)').click()
+        browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_pm_'
+                                             'td_input > select:nth-child(1) > option:nth-child(1)').click()
         time.sleep(1)
 
         if es_aval and not aval_primera:
@@ -355,6 +386,7 @@ def boutique_operations(browser, d):
                                                       ' > select:nth-child(1) > option:nth-child(3)')
             cf.click()
             time.sleep(1)
+
             ff.send_keys(ref_1era_PM)
 
         if es_aval and aval_primera:
@@ -377,9 +409,9 @@ def boutique_operations(browser, d):
                                                       ' > select:nth-child(1)')
             ef.click()
             time.sleep(1)
-            e1 = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:cab_mixte_td_input'
-                                                      ' > select:nth-child(1) > option:nth-child(3)')
-            e1.click()
+            browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:cab_mixte_td_input >'
+                                                 ' select:nth-child(1) > option:nth-child(3)').click()
+
             time.sleep(1)
 
         if not es_aval:
@@ -388,9 +420,6 @@ def boutique_operations(browser, d):
                                                       'input > select:nth-child(1) > option:nth-child(3)')
             af.click()
             time.sleep(1)
-            a1 = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_pm_td_input'
-                                                      ' > select:nth-child(1) > option:nth-child(3)')
-            a1.click()
             cf = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:type_cde_td_input'
                                                       ' > select:nth-child(1)')
             cf.click()
@@ -399,8 +428,9 @@ def boutique_operations(browser, d):
                                                       ' > select:nth-child(1) > option:nth-child(1)')
             c1.click()
 
-        time.sleep(1)
+        time.sleep(2)
         # Si solo arquetas se deja por defecto GC, si arquetas + poteaux se pone GC et apus aeris
+        browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:cont_com\/gcblo\:cde_concerne > option:nth-child(1)').click()
         select_postes = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:cont_com\/gcblo\:cde_'
                                                              'concerne > option:nth-child(2)')
         if solo_arquetas == 'gc+p':
@@ -439,17 +469,22 @@ def boutique_operations(browser, d):
                 add_button.click()
 
                 # TODO recuperar el numero fci
-    fci = 'F4214120316'
+    ref_cli_form = browser.find_element_by_css_selector('#\/com\:commande\/com\:ref_client')
+    ref_cli_form.clear()
+    ref_cli_form.send_keys(ref_cli)
+    time.sleep(1)
+    browser.find_element_by_css_selector('a.sfci_blackb:nth-child(11)').click()
+    time.sleep(3)
+    texto = browser.find_element_by_css_selector('#nomerror').text
+    texto_split = texto.split(sep='N')
+    c = texto_split[1]
+    fci = c[2:14]
     d['fci'] = fci
-    b = 1
 
 
 def tsp_operations_1(dosier, ws):
 # operaciones despues de obtener FCI en el tsp
     ws.Cells(dosier['row'], 40).Value = dosier['fci']
-    fecha_fci = dosier['fci'][-4:-2] + '-' + dosier['fci'][-6:-4] + '-' + dosier['fci'][-2:]
-    ws.Cells(dosier['row'], 41).Value = fecha_fci
-    ws.Cells(dosier['row'], 42).Value = 'DEP'
     ws.Cells(dosier['row'], 65).Value = 'v1'
     ws.Cells(dosier['row'], 66).Value = 'Attente Input TFX'
 
@@ -459,6 +494,10 @@ def mover_ficheros(d):
     ruta = os.getcwd() + os.sep
     origen = ruta + 'movido'
     destino = 'C:\\Users\\josko\\PycharmProjects\\josko\\mover\\'
+    # for e in os.listdir(o):
+    #     if '1572' in e:
+    # os.rename("NOTICIAS.txt", "NEWS.txt")
+    # Si el segundo argumento corresponde al nombre de un archivo existente, su contenido es reemplazado; si es una carpeta, se lanzará la excepción OSError.
     if os.path.exists(origen):
         ruta = shutil.move(origen, destino)
         print('El directorio ha sido movido a', ruta)
@@ -485,9 +524,7 @@ def obtenerFCI():
     #             'Sus1230': {'es_aval': True, 'IPE_PM': 'FI-92073-001E', 'ref_1era_PM': 'F28968041116', 'date_fin': '18/01/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '14/12/2016', 'nombre': 'Sus1230', 'es_1ca': True, 'cliente': 'SC1', 'tipo': 'CPL', 'num_EL': 10}
     #
     # }
-    dosieres = {
-        'Nee1590': {'formulario': 'SC1_ST_GERMAIN_LAXIS_SPL', 'num_EL': None, 'solo_arquetas': 'gc', 'IPE_PM': None, 'es_aval': False, 'cliente': 'SC1', 'tipo': 'SPL', 'ref_1era_PM': None, 'row': 132, 'calles': ['RUE  BAILLY'], 'date_fin': '02/03/2017', 'ciudad': 'NEUILLY SUR SEINE', 'nombre': 'Nee1590', 'es_1ca': False, 'ref_cli': 'SC1_IMB_92051_C_3178', 'date_ini': '02/02/2017'}
-                }
+    dosieres = {'Moe1658': {'nombre': 'Moe1658', 'num_EL': '361', 'ref_cli': 'SC1_EZA_PA_PB_77305_5870', 'ref_1era_PM': 'FI-77305-0001', 'es_1ca': True, 'solo_arquetas': 'gc', 'formulario': 'SC1_MONTEREAU_FAULT_CPL', 'date_fin': '04/04/2017', 'tipo': 'CPL', 'cliente': 'SC1', 'es_aval': True, 'calles': ['RUE ALBERT SCHWEITZER'], 'IPE_PM': 'FI-77305-0001', 'row': 200, 'date_ini': '28/02/2017', 'ciudad': 'MONTEREAU-FAULT-YONNE'}}
 
     #  FUNCIONA PARA ACCEDER AL NAS DESDE MI ORDENADOR
     # for cosa in os.listdir('Z:/03-PRODUCCION/0.CAFT/SC1/PRODUCCIÓN/Tab Suivi Prod'):
@@ -502,7 +539,6 @@ def obtenerFCI():
     #
     # pass
     # b= 1
-
     try:
         dosieres = cargarDatosExcel()
     except Exception as ex:
@@ -518,17 +554,20 @@ def obtenerFCI():
         wb = excel.Workbooks.Open(r'C:\Users\josko\PycharmProjects\josko\SuiviJRU.xlsx')
     else:
         wb = excel.Workbooks.Open(r'\home\ubuntu\3id2plus\SuiviJRU.xlsx')
+    wb.Visible = True
     ws = wb.Worksheets('Tab Suivi Prod')
+    time.sleep(5)
 
 #TODO cambiar a keys de dosieres antes estaba en dosieres_act
     for d in dosieres:
         try:
-            browser = set_up_browser()
-            login(browser)
-            boutique_operations(browser, dosieres[d])
-            time.sleep(4)
-            tsp_operations_1(dosieres[d], ws)
+            dosieres[d]['fci'] = 'F28988160217'
             # mover_ficheros(dosieres[d])
+            # browser = set_up_browser()
+            # login(browser)
+            # boutique_operations(browser, dosieres[d])
+            # time.sleep(4)
+            tsp_operations_1(dosieres[d], ws)
 
         except Exception as ex:
             logging.error('%s No ha podido completarse por: %s', dosieres[d]['nombre'], ex.msg)
@@ -539,13 +578,14 @@ def obtenerFCI():
             result[dosieres[d]['nombre']] = dosieres[d]['nombre'] + '  --> Se ha procesado correctamente: '
 
         finally:
-            if os.name != 'nt':
-                browser.service.process.send_signal(signal.SIGTERM)
-            browser.quit()
+            # if os.name != 'nt':
+            #     browser.service.process.send_signal(signal.SIGTERM)
+            # browser.quit()
             time.sleep(5)
 
     print('Salvando excel')
-    wb.SaveAs(r'C:\Users\josko\PycharmProjects\josko\SuiviJRU2.xlsx')
+    wb.Close(True)
+    # wb.SaveAs(r'C:\Users\josko\PycharmProjects\josko\SuiviJRU3.xlsx')
     excel.Application.Quit()
     return result
 
