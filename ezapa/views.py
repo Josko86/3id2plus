@@ -5,9 +5,9 @@ import templates
 from scripts.ipon import ejecutar_ipon
 from scripts.obtenfci import obtenerFCI
 
-def obtenerNumeroComanda(request):
+def obtenerNumeroComanda(request, client):
 
-    result = obtenerFCI()
+    result = obtenerFCI(client)
     c = Context({'result': result})
     return render(request, 'obtenerfci.html', c)
 
