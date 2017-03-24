@@ -74,11 +74,7 @@ def select_imb_con_pt(browser, inmueble, frame2):
     id_inmuble_form = browser.find_element_by_xpath(
         '/html/body/div[1]/div[1]/div/form[1]/div/table/tbody/tr[2]/td[1]/table/tbody/tr[1]/td/div[1]/table/tbody/tr/td[3]/font/div/input')
     time.sleep(1)
-    id_inmuble_form.send_keys('I')
-    shell.SendKeys('{DOWN}', 0)
-    time.sleep(1)
-    shell.SendKeys("{ENTER}", 0)
-    time.sleep(1)
+    id_inmuble_form.send_keys(inmueble)
     shell.SendKeys("{ENTER}", 0)
     time.sleep(8)
     row_imb = browser.find_element_by_xpath(
@@ -173,8 +169,9 @@ def get_data():
     """
     pythoncom.CoInitialize()
     excel = win32com.client.gencache.EnsureDispatch('Excel.Application')
-    wb = excel.Workbooks.Open(r'C:\Users\josko\PycharmProjects\josko\inmueble_prueba4.xls')
-    excel.Visible = True
+    excel.EnableEvents = False
+    wb = excel.Workbooks.Open(r'C:\Users\josko\PycharmProjects\josko\inmueble_prueba6.xls')
+    # excel.Visible = True
     ws_ic = wb.Worksheets('Infos clés')
     ws_pb = wb.Worksheets('PB')
     id_imb = ws_ic.Cells(5, 3).Value
@@ -185,8 +182,7 @@ def get_data():
     BTIs = dict()
     cables_list = []
     #TODO cambiar cuando sea definitive
-    project['nom_project'] = id_imb + '_' + 'josk'
-    # project['nom_project'] = id_imb + '_' + adress_imb
+    project['nom_project'] = id_imb + '_' + adress_imb
     row = 6
     COL_CM = 2
     COL_MATERIAL = 7
@@ -276,7 +272,7 @@ def get_data():
     project['pbs'] = PBs
     project['btis'] = BTIs
     wb.Close(False)
-    wb = excel.Workbooks.Open(r'C:\Users\josko\PycharmProjects\josko\cablage4.xlsx')
+    wb = excel.Workbooks.Open(r'C:\Users\josko\PycharmProjects\josko\cablage6.xlsx')
     excel.Visible = True
     sheet = wb.Worksheets(1)
     canvas = sheet.Shapes
@@ -302,6 +298,11 @@ def get_data():
         num_fo = b[3]
         cables[nombre] = {'metros': metros, 'num_fo': num_fo, 'ini': ini, 'fin': fin}
 
+    for shp in canvas:
+        box = shp.TextFrame2.TextRange.Characters.Text
+        if 'PA ' in box and 'PT ' in box:
+            print(box)
+
     project['cables'] = cables
     wb.Close(False)
     excel.Application.Quit()
@@ -323,7 +324,7 @@ def set_up_browser():
 
         ################################## IE ####################################################
         browser = webdriver.Ie(r'C:\Users\josko\PycharmProjects\josko\scripts\IEDriverServer.exe')
-    browser.get('https://lyon.metagate.orange.com/dana/home/index.cgi')
+    browser.get('https://metagate.orange.com')
     browser.set_window_position(WX, WY)
     browser.set_window_size(1700, 1100)
     time.sleep(1)
@@ -333,12 +334,11 @@ def set_up_browser():
 def login(browser):
 
     elem = browser.find_element_by_id("username")
-    elem.send_keys("L")
-    shell.SendKeys('{DOWN}', 1)
-    time.sleep(1)
-    shell.SendKeys("{ENTER}", 0)
+    elem.clear()
+    elem.send_keys("WZLM6940")
     elem2 = browser.find_element_by_id("password")
-    # elem2.send_keys("Soge2017*")
+    elem2.clear()
+    elem2.send_keys("Soge2017*")
     time.sleep(1)
     elem2.send_keys(Keys.RETURN)
     time.sleep(2)
@@ -366,19 +366,13 @@ def login(browser):
     browser.get('https://ipon.sso.francetelecom.fr/NGI/GassiAccess.jsp')
     time.sleep(1)
     user_form = browser.find_element_by_id('user')
-    user_form.send_keys('L')
+    user_form.send_keys('WZLM6940')
+    elem2 = browser.find_element_by_id("password")
+    elem2.clear()
+    time.sleep(2)
+    elem2.send_keys("Soge2017*")
     time.sleep(1)
-    shell.SendKeys('{DOWN}', 0)
-    time.sleep(1)
-    shell.SendKeys("{ENTER}", 0)
-    time.sleep(1)
-    shell.SendKeys("{TAB}", 0)
-    time.sleep(1)
-    shell.SendKeys("{TAB}", 0)
-    # elem2 = browser.find_element_by_id("password")
-    # elem2.send_keys("Soge2017*")
-    # time.sleep(1)
-    shell.SendKeys("{ENTER}", 0)
+    sign_in_button = browser.find_element_by_xpath('/html/body/div/div[1]/div[2]/div[2]/form/span/span/a').click()
     time.sleep(3)
     browser.get('https://ipon.sso.francetelecom.fr/NGI/GassiAccess.jsp')
     time.sleep(4)
@@ -414,14 +408,10 @@ def select_imb(browser, imbs, inmueble):
     id_inmuble_form = browser.find_element_by_xpath(
         '/html/body/div[1]/div[1]/div/form[1]/div/table/tbody/tr[2]/td[1]/table/tbody/tr[1]/td/div[1]/table/tbody/tr/td[3]/font/div/input')
     time.sleep(1)
-    id_inmuble_form.send_keys('I')
-    shell.SendKeys('{DOWN}', 0)  # Elegir el imnmueble
-    time.sleep(1)
-    shell.SendKeys('{DOWN}', 0)
-    time.sleep(1)
+    id_inmuble_form.send_keys(inmueble)
     shell.SendKeys("{ENTER}", 0)
     time.sleep(1)
-    shell.SendKeys("{ENTER}", 0)
+    browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form[1]/div/table/tbody/tr[1]/td/table/tbody/tr/td[1]/a').click()
     time.sleep(6)
     browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form[2]/table/tbody/tr/td/div[1]/table/tbody/tr/td[2]/a').click()
     time.sleep(3)
@@ -468,7 +458,7 @@ def estudio(browser, nra, imbs, inmueble):
     browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[1]/tbody/tr/td[2]/a').click()
     time.sleep(2)
 
-    pass
+
 def consulter_metre(browser, imbs, inmueble):
     # consulter metre la jour
     browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[1]/tbody/tr/td[4]/a').click()
@@ -476,9 +466,9 @@ def consulter_metre(browser, imbs, inmueble):
 
     for batiment in imbs[inmueble].keys():
         # creer batiment
-        # browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]/td/form/table[2]/tbody/tr/td/table[1]/tbody/tr/td/table/tbody/tr/td[10]/font/a[2]').click()
-        # time.sleep(2)
-        # browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/form/table/tbody/tr[3]/td/font/div[1]/a').click()
+        browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]/td/form/table[2]/tbody/tr/td/table[1]/tbody/tr/td/table/tbody/tr/td[10]/font/a[2]').click()
+        time.sleep(2)
+        browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/form/table/tbody/tr[3]/td/font/div[1]/a').click()
         time.sleep(3)
         # browser.set_window_position(WX, WY)
         # browser.set_window_size(1700, 1100)
@@ -486,32 +476,32 @@ def consulter_metre(browser, imbs, inmueble):
         time.sleep(6)
         win32_click(2397, 757)
         time.sleep(2)
-        # type_batiment = browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]'
-        #                                               '/td/form/table[2]/tbody/tr/td/table[2]/tbody/tr/td/div/table/tbody/tr/td[6]/div')
-        # elem_but_pos(type_batiment)
-        #
-        # time.sleep(1)
-        # for i in range(4):
-        #     shell.SendKeys('{UP}', 0)
-        #     time.sleep(1)
-        # shell.SendKeys('{DOWN}', 0)
-        # time.sleep(1)
-        # shell.SendKeys("{ENTER}", 0)
-        # time.sleep(1)
-        # etat_batiment = browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]'
-        #                                               '/td/form/table[2]/tbody/tr/td/table[2]/tbody/tr/td/div/table/tbody/tr/td[7]/div')
-        # elem_but_pos(etat_batiment)
-        # time.sleep(1)
-        # for i in range(4):
-        #     shell.SendKeys('{DOWN}', 0)
-        #     time.sleep(1)
-        # shell.SendKeys('{UP}', 0)
-        # time.sleep(1)
-        # shell.SendKeys("{ENTER}", 0)
-        # time.sleep(2)
-        # # click sauvegarder
-        # browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]/td/form/'
-        #                               'table[2]/tbody/tr/td/table[1]/tbody/tr/td/table/tbody/tr/td[2]/font/a[2]').click()
+        type_batiment = browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]'
+                                                      '/td/form/table[2]/tbody/tr/td/table[2]/tbody/tr/td/div/table/tbody/tr/td[6]/div')
+        elem_but_pos(type_batiment)
+
+        time.sleep(1)
+        for i in range(4):
+            shell.SendKeys('{DOWN}', 0)
+            time.sleep(1)
+        shell.SendKeys('{UP}', 0)
+        time.sleep(1)
+        shell.SendKeys("{ENTER}", 0)
+        time.sleep(1)
+        etat_batiment = browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]'
+                                                      '/td/form/table[2]/tbody/tr/td/table[2]/tbody/tr/td/div/table/tbody/tr/td[7]/div')
+        elem_but_pos(etat_batiment)
+        time.sleep(1)
+        for i in range(4):
+            shell.SendKeys('{DOWN}', 0)
+            time.sleep(1)
+        shell.SendKeys('{UP}', 0)
+        time.sleep(1)
+        shell.SendKeys("{ENTER}", 0)
+        time.sleep(2)
+        # click sauvegarder
+        browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]/td/form/'
+                                      'table[2]/tbody/tr/td/table[1]/tbody/tr/td/table/tbody/tr/td[2]/font/a[2]').click()
         time.sleep(5)
         # click [no name]
         browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]/td/form/tabl'
@@ -657,13 +647,15 @@ def consulter_metre(browser, imbs, inmueble):
 def crear_pb(browser, imbs, inmueble, pbs, btis):
     pythoncom.CoInitialize()
     excel = win32com.client.gencache.EnsureDispatch('Excel.Application')
-    wb = excel.Workbooks.Open(r'C:\Users\josko\PycharmProjects\josko\cablage4.xlsx')
+    wb2 = excel.Workbooks.Open(r'C:\Users\josko\PycharmProjects\josko\cablage6.xlsx')
     excel.Visible = True
-    sheet = wb.Worksheets(1)
+    sheet = wb2.Worksheets(1)
     canvas = sheet.Shapes
     time.sleep(8)
     for pb in pbs:
         if pbs[pb]['inmueble'] == inmueble:
+            browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form[2]/table/tbody/tr/td/table/tbody/tr/td[2]/a').click()
+            time.sleep(2)
             browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form[2]/table/tbody/tr/td/table/tbody/tr/td[5]/a').click()
             time.sleep(2)
             rechercher_button = browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[5]/td/div[2]/div/a')
@@ -671,9 +663,11 @@ def crear_pb(browser, imbs, inmueble, pbs, btis):
             time.sleep(1)
             select_modele = browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/'
                                                           'td/table/tbody/tr[6]/td[2]/select').click()
+            pb_description = 'PB 3M AUTO GOU APPARENT ou REFUS APPARENT'
             if pbs[pb]['tipo'] == '[6.i.aco]':
                 selection_modele = browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/'
-                                                                 'table/tbody/tr[6]/td[2]/select/option[12]').click()
+                                                                 'table/tbody/tr[6]/td[2]/select/option[11]').click()
+                pb_description = 'PB ACOME AUTO GOU APPARENT ou REFUS APPARENT'
             if pbs[pb]['tipo'] == '[12.i13.3m]':
                 selection_modele = browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table/tbody/tr/td/'
                                                                      'table/tbody/tr[6]/td[2]/select/option[5]').click()
@@ -694,6 +688,11 @@ def crear_pb(browser, imbs, inmueble, pbs, btis):
                     shp.TextFrame2.TextRange.Characters.Text = pt_value
 
             pbs[pb]['pt'] = pt_value
+            #Cambiar la descripción del PB
+            description_area = browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/'
+                                                             'td/table[2]/tbody/tr[2]/td[2]/textarea')
+            description_area.clear()
+            description_area.send_keys(pb_description)
             #Hauteur par rapport au sol
             browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[15]/td[2]/select').click()
             browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[15]/td[2]/select/option[2]').click()
@@ -725,6 +724,7 @@ def crear_pb(browser, imbs, inmueble, pbs, btis):
             time.sleep(1)
             select_modele = browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/'
                                                           'td/table/tbody/tr[6]/td[2]/select').click()
+            bti_description = 'PEO BPI NEXANS T3'
             if btis[bti]['tipo'] == 'BTI 36':
                 selection_modele = browser.find_element_by_xpath(
                     '/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[6]/td[2]/select/option[19]').click()
@@ -735,8 +735,21 @@ def crear_pb(browser, imbs, inmueble, pbs, btis):
             # click creer
             browser.find_element_by_xpath(
                 '/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[17]/td/div[1]/div/a').click()
-            # TODO hacer lo de añadir mas cassetes si es necesario
             time.sleep(3)
+            # Seleccionar todos los cassetes para meterlos en la carte deinsertion
+            browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/div[1]/table/thead/tr/th[1]/span/a').click()
+            time.sleep(1)
+            browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/table[1]/tbody/tr/td[5]/a').click()
+            time.sleep(2)
+            # Seleccionar module de 6 para BTI de 36 y module de 12 si la BTI es de 144
+            if btis[bti]['tipo'] == 'BTI 36':
+                browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table/tbody/tr/td/table[2]/tbody/tr[11]/td[1]/input').click()
+            elif btis[bti]['tipo'] == 'BTI 144':
+                browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table/tbody/tr/td/table[2]/tbody/tr[13]/td[1]/input').click()
+            time.sleep(2)
+            browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table[2]/tbody/tr/td/table[1]/tbody/tr/td[2]/a').click()
+            time.sleep(2)
+            # pulsar en parametros
             browser.find_element_by_xpath(
                 '/html/body/div[1]/div[1]/table/tbody/tr[3]/td/table/tbody/tr/td/div[4]/table/tbody/tr/td[2]/a').click()
             time.sleep(2)
@@ -754,11 +767,21 @@ def crear_pb(browser, imbs, inmueble, pbs, btis):
                     shp.TextFrame2.TextRange.Characters.Text = box
 
             btis[bti]['pt'] = pt_value
+            time.sleep(2)
+            # Point d epissurage a oui
+            browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[12]/td[2]/select').click()
+            browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[12]/td[2]/select/option[2]').click()
+            time.sleep(1)
+            # Cambiar la descripción del PB
+            description_area = browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/'
+                                                             'td/table[2]/tbody/tr[2]/td[2]/textarea')
+            description_area.clear()
+            description_area.send_keys(bti_description)
             # Hauteur par rapport au sol
             browser.find_element_by_xpath(
                 '/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[15]/td[2]/select').click()
             browser.find_element_by_xpath(
-                '/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[15]/td[2]/select/option[2]').click()
+                '/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[15]/td[2]/select/option[3]').click()
             # Position lequipament
             time.sleep(1)
             browser.find_element_by_xpath(
@@ -778,10 +801,11 @@ def crear_pb(browser, imbs, inmueble, pbs, btis):
             time.sleep(2)
             browser.find_element_by_xpath('/html/body/div/div[1]/table/tbody/tr[3]/td/div/div/a[7]').click()
             time.sleep(2)
-
+    # # TODO guardar el plan decablage despues de sacar los PTs pillar la chambre antes del excel sacar principio o aqui
+    wb2.Close(False)
     for pb in pbs:
         if pbs[pb]['inmueble'] == inmueble:
-            #CH 01573 de ejemplo luego se pillará de un excel
+            # TODO CH 01573 de ejemplo luego se pillará de un excel
             browser.find_element_by_xpath('/html/body/div/div[1]/table/tbody/tr[1]/td/table/tbody/tr/td[3]').click()
             time.sleep(1)
             rechercher_chambre = browser.find_element_by_xpath('/html/body/div[1]/div[1]/table/tbody/tr[1]/td/table/'
@@ -794,7 +818,8 @@ def crear_pb(browser, imbs, inmueble, pbs, btis):
             pt_code = 'PT 1394'
             time.sleep(1)
             input_chambre.send_keys(chambre_code)
-            shell.SendKeys("{ENTER}", 0)
+            time.sleep(1)
+            browser.find_element_by_id('searchButton').click()
             time.sleep(4)
             insee = inmueble.split('/')[1]
             identifiant = chambre_code + '/' + insee
@@ -828,12 +853,9 @@ def crear_pb(browser, imbs, inmueble, pbs, btis):
             id_inmuble_form = browser.find_element_by_xpath(
                 '/html/body/div[1]/div/div/form[1]/div/table/tbody/tr[2]/td[1]/table/tbody/tr[1]/td/div[1]/table/tbody/tr/td[3]/font/div/input')
             time.sleep(1)
-            id_inmuble_form.send_keys('I')
-            shell.SendKeys('{DOWN}', 0)
+            id_inmuble_form.send_keys(inmueble)
             time.sleep(1)
-            shell.SendKeys("{ENTER}", 0)
-            time.sleep(1)
-            shell.SendKeys("{ENTER}", 0)
+            browser.find_element_by_id('searchButton').click()
             time.sleep(8)
             browser.find_element_by_xpath(
                 '/html/body/div[1]/div/div/form[2]/table/tbody/tr/td/div[1]/table/tbody/tr/td[1]/input').click()
@@ -869,7 +891,7 @@ def crear_pb(browser, imbs, inmueble, pbs, btis):
             time.sleep(2)
             browser.switch_to_window(main_window)
             browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table[2]/tbody/tr/td/a[1]').click()
-    wb.Close(True)
+    # wb2.Close(True)
 
 
 def crear_cables(browser, imbs, inmueble, pbs, btis, cables, pa_chambre):
@@ -877,7 +899,7 @@ def crear_cables(browser, imbs, inmueble, pbs, btis, cables, pa_chambre):
     time.sleep(2)
 
     for cable in cables:
-        if len(cables[cable]['ini']) == 1 or len(cables[cable]['ini']) > 2:  # si el cable va de pb a pb o de bti a pb
+        if 'bti' in cables[cable]['ini']:  # si el cable va de bti a pb es interno
             time.sleep(3)
             browser.find_element_by_xpath(
                 '/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/table/tbody/tr/td[4]/a').click()
@@ -946,53 +968,53 @@ def crear_cables(browser, imbs, inmueble, pbs, btis, cables, pa_chambre):
         time.sleep(2)
         browser.find_element_by_xpath('/html/body/div[1]/div[1]/table/tbody/tr[3]/td/table/tbody/tr/td/div[2]/table/tbody/tr/td[2]/a').click()
         # if cables[cable]['ini'] == 'PA':  # si el cable es externo
-            # time.sleep(1)
-            # browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/table/tbody/tr/td[4]/a').click()
-            # time.sleep(1)
-            # num_fo_form = browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[3]/td[2]/input')
-            # num_fo_form.clear()
-            # num_fo_form.send_keys(cables[cable]['num_fo'])
-            # time.sleep(1)
-            # # Pulsar el + para añadir site suport que conecta los cables
-            # browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[8]/td[2]/a[1]').click()
-            # time.sleep(4)
-            # main_window = browser.current_window_handle
-            # time.sleep(2)
-            # signin_window_handle = browser.window_handles[1]
-            # browser.switch_to.window(signin_window_handle)
-            # time.sleep(3)
-            # frame = browser.find_element_by_xpath('/html/frameset/frame[1]')
-            # frame2 = browser.find_element_by_xpath('/html/frameset/frame[2]')
-            # browser.switch_to_frame(frame)
-            # time.sleep(2)
-            # select_pa(browser, pa_chambre, inmueble, frame2)
-            # browser.switch_to_window(main_window)
-            # time.sleep(1)
-            # browser.find_element_by_xpath(
-            #     '/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[8]/td[2]/a[1]').click()
-            # time.sleep(4)
-            # main_window = browser.current_window_handle
-            # time.sleep(2)
-            # signin_window_handle = browser.window_handles[1]
-            # browser.switch_to.window(signin_window_handle)
-            # time.sleep(3)
-            # frame = browser.find_element_by_xpath('/html/frameset/frame[1]')
-            # frame2 = browser.find_element_by_xpath('/html/frameset/frame[2]')
-            # browser.switch_to_frame(frame)
-            # time.sleep(2)
-            # for pb in pbs:
-            #     if cables[cable]['fin'] == pb:
-            #         if pbs[pb]['inmueble'] == inmueble:
-            #             select_imb_con_pt(browser, inmueble, frame2)
-            # for bti in btis:
-            #     fin = cables[cable]['fin']
-            #     if fin[-1] == bti:
-            #         if btis[bti]['imb_is'] == inmueble:
-            #             select_imb_con_pt(browser, inmueble, frame2)
-            # browser.switch_to_window(main_window)
-            # time.sleep(2)
-            # # Crear cable
-            # browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[15]/td/a[1]').click()
+        #     time.sleep(1)
+        #     browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/table/tbody/tr/td[4]/a').click()
+        #     time.sleep(1)
+        #     num_fo_form = browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[3]/td[2]/input')
+        #     num_fo_form.clear()
+        #     num_fo_form.send_keys(cables[cable]['num_fo'])
+        #     time.sleep(1)
+        #     # Pulsar el + para añadir site suport que conecta los cables
+        #     browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[8]/td[2]/a[1]').click()
+        #     time.sleep(4)
+        #     main_window = browser.current_window_handle
+        #     time.sleep(2)
+        #     signin_window_handle = browser.window_handles[1]
+        #     browser.switch_to.window(signin_window_handle)
+        #     time.sleep(3)
+        #     frame = browser.find_element_by_xpath('/html/frameset/frame[1]')
+        #     frame2 = browser.find_element_by_xpath('/html/frameset/frame[2]')
+        #     browser.switch_to_frame(frame)
+        #     time.sleep(2)
+        #     select_pa(browser, pa_chambre, inmueble, frame2)
+        #     browser.switch_to_window(main_window)
+        #     time.sleep(1)
+        #     browser.find_element_by_xpath(
+        #         '/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[8]/td[2]/a[1]').click()
+        #     time.sleep(4)
+        #     main_window = browser.current_window_handle
+        #     time.sleep(2)
+        #     signin_window_handle = browser.window_handles[1]
+        #     browser.switch_to.window(signin_window_handle)
+        #     time.sleep(3)
+        #     frame = browser.find_element_by_xpath('/html/frameset/frame[1]')
+        #     frame2 = browser.find_element_by_xpath('/html/frameset/frame[2]')
+        #     browser.switch_to_frame(frame)
+        #     time.sleep(2)
+        #     for pb in pbs:
+        #         if cables[cable]['fin'] == pb:
+        #             if pbs[pb]['inmueble'] == inmueble:
+        #                 select_imb_con_pt(browser, inmueble, frame2)
+        #     for bti in btis:
+        #         fin = cables[cable]['fin']
+        #         if fin[-1] == bti:
+        #             if btis[bti]['imb_is'] == inmueble:
+        #                 select_imb_con_pt(browser, inmueble, frame2)
+        #     browser.switch_to_window(main_window)
+        #     time.sleep(2)
+        #     # Crear cable
+        #     browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[15]/td/a[1]').click()
 
         time.sleep(2)
         # Pulsar el cable
@@ -1076,36 +1098,56 @@ def crear_cables(browser, imbs, inmueble, pbs, btis, cables, pa_chambre):
         # time.sleep(1)
         # browser.switch_to_window(main_window)
         # time.sleep(3)
+
+        # Click en parametros para OSP inventaire
+        browser.find_element_by_xpath('/html/body/div[1]/div[1]/table/tbody/tr[3]/td/table/tbody/tr/td/div[4]/table/tbody/tr/td[2]/a').click()
+        time.sleep(3)
+        browser.find_element_by_xpath('/html/body/div/div[1]/div/div[3]/form/table/tbody/tr/td/table[1]/tbody/tr/td[2]/a').click()
+        time.sleep(3)
+        browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[24]/td[2]/select').click()
+        browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[24]/td[2]/select/option[4]').click()
+        time.sleep(1)
+        longeur_form = browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[26]/td[2]/input')
+        longeur_form.send_keys(cables[cable]['metros'])
+        time.sleep(1)
+        browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[1]/tbody/tr/td[2]/a').click()
+        time.sleep(2)
+
         tr_number = browser.find_element_by_xpath('/html/body/div[1]/div[1]/table/tbody/tr[3]/td/div/div/a[6]').text
-        # pythoncom.CoInitialize()
-        # excel = win32com.client.gencache.EnsureDispatch('Excel.Application')
-        # wb = excel.Workbooks.Open(r'C:\Users\josko\PycharmProjects\josko\cablage4.xlsx')
-        # excel.Visible = True
-        # sheet = wb.Worksheets(1)
-        # canvas = sheet.Shapes
-        # time.sleep(8)
+        pythoncom.CoInitialize()
+        excel = win32com.client.gencache.EnsureDispatch('Excel.Application')
+        wb = excel.Workbooks.Open(r'C:\Users\josko\PycharmProjects\josko\cablage6.xlsx')
+        excel.Visible = True
+        sheet = wb.Worksheets(1)
+        canvas = sheet.Shapes
+        time.sleep(8)
         cables[cable]['nombre'] = tr_number
-        # for shp in canvas:
-        #     box = shp.TextFrame2.TextRange.Characters.Text
-        #     if 'TR' in box:
-        #         box = box.replace('TR PA-a', tr_number)
-        #         shp.TextFrame2.TextRange.Characters.Text = box
-        # time.sleep(1)
+        for shp in canvas:
+            box = shp.TextFrame2.TextRange.Characters.Text
+            if 'TR' in box:
+                box = box.replace('TR PA-a', tr_number)
+                shp.TextFrame2.TextRange.Characters.Text = box
+        time.sleep(1)
+        # wb.Close(True)
         # Volver a cables
         browser.find_element_by_xpath('/html/body/div[1]/div[1]/table/tbody/tr[3]/td/div/div/a[5]').click()
-        time.sleep(2)
-        # browser.set_window_position(WX, WY)
-        # browser.set_window_size(1700, 1100)
-        time.sleep(1)
-    for cable in cables:
-        cable_nom = cables[cable]['nombre']
-        cn1 = cable_nom[3:5]
-        cn2 = cable_nom[-4:]
-        row_cable = browser.find_element_by_xpath("//*[contains(text(), '" + cn1 + "') and contains(text(), '" + cn2 + "')]")
-        row_parent = row_cable.find_element_by_xpath('../..')
-        long_cable = row_parent.find_element_by_xpath('td[3]')
-        elem_but_pos(long_cable)
-
+        time.sleep(3)
+        # Para guardar la longitud del cable si no lo guarda en lo otro
+    # for cable in cables:
+    #     cable_nom = cables[cable]['nombre']
+    #     cn1 = cable_nom[3:5]
+    #     cn2 = cable_nom[-4:]
+    #     row_cable = browser.find_element_by_xpath("//*[contains(text(), '" + cn1 + "') and contains(text(), '" + cn2 + "')]")
+    #     row_parent = row_cable.find_element_by_xpath('../..')
+    #     long_cable = row_parent.find_element_by_xpath('td[3]')
+    #     elem_but_pos(long_cable)
+    #     longitud_cable = cables[cable]['metros']
+    #     shell.SendKeys(longitud_cable, 0)
+    #     time.sleep(1)
+    #     shell.SendKeys("{ENTER}", 0)
+    #     time.sleep(1)
+    # browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/table/tbody/tr/td[2]/a').click()
+    # time.sleep(2)
 
 def ejecutar_ipon(nra):
 
@@ -1118,12 +1160,12 @@ def ejecutar_ipon(nra):
     pa_pt = project['pa_pt']
     browser = set_up_browser()
     login(browser)
-    # crear_proyecto_ipon(browser, nra, project)
+    crear_proyecto_ipon(browser, nra, project)
     for inmueble in imbs.keys():
         select_imb(browser, imbs, inmueble)
-        # estudio(browser, nra, imbs, inmueble)
-        # consulter_metre(browser, imbs, inmueble)
-        # crear_pb(browser, imbs, inmueble, pbs, btis)
+        estudio(browser, nra, imbs, inmueble)
+        consulter_metre(browser, imbs, inmueble)
+        crear_pb(browser, imbs, inmueble, pbs, btis)
         crear_cables(browser, imbs, inmueble, pbs, btis, cables, pa_chambre)
 
 

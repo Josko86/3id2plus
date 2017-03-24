@@ -8,13 +8,14 @@ import time
 import logging
 import openpyxl
 import zipfile
+from datetime import datetime, date
 from os.path import basename
 import win32com.client as win32
 import pythoncom
 import shutil, os
 
 
-# Funciones utils
+# Funciones Utils
 def esAval(row, hp):
     global aval
     if hp.cell(row= row, column= 6).value == 'Aval PM':
@@ -84,7 +85,7 @@ def calculoCalles(row,hp):
     return calles
 
 
-def calculoFormulario(ciudad, tp, hf):
+def calculoFormulario(ciudad, tp, hf, client):
     global formulario
     for row in hf.iter_rows(min_row=1, max_col=1, max_row=hf.max_row):
         for celda in row:
@@ -92,6 +93,7 @@ def calculoFormulario(ciudad, tp, hf):
                 column = 9
                 if tp == 'CPL': column = 10
                 elif tp == 'STR': column = 11
+                if client == 'SC6': column += 1
                 formulario = hf.cell(row=celda.row, column=column).value
     return  formulario
 
@@ -100,7 +102,7 @@ def cargarDatosExcel(client):
 # Carga de todos los datos necesarios del excel y los mete en un diccionario de dosieres
     print('Carga de todos los datos necesarios del excel y los mete en un diccionario de dosieres')
 # doc = openpyxl.load_workbook('SuiviJRU.xlsx')
-# doc.save('SuiviJRU.xlsx')
+
     try:
         if os.name == 'nt':
             # doc = openpyxl.load_workbook('SuiviJRU.xlsm', data_only=True)
@@ -108,7 +110,13 @@ def cargarDatosExcel(client):
                 doc = openpyxl.load_workbook(r'Z:/03-PRODUCCION/0.CAFT/SC1/PRODUCCIÓN/Tab Suivi Prod/SC1 TSP 2017.xlsm',
                                              data_only=True)
             elif client == 'SC00':
-                doc = openpyxl.load_workbook(r'Z:/03-PRODUCCION/0.CAFT/SC00/PRODUCCIÓN/Tab Suivi Prod/SC00 TSP 2017 V2.xlsm',
+                doc = openpyxl.load_workbook(r'Z:/03-PRODUCCION/0.CAFT/SC00/PRODUCCIÓN/Tab Suivi Prod/SC00 TSP 2017.xlsm',
+                                             data_only=True)
+            elif client == 'SC6':
+                doc = openpyxl.load_workbook(r'Z:/03-PRODUCCION/0.CAFT/SC6/PRODUCCIÓN/Tab Suivi Prod/SC6 TSP 2017.xlsm',
+                                             data_only=True)
+            elif client == 'SC4':
+                doc = openpyxl.load_workbook(r'Z:/03-PRODUCCION/0.CAFT/SC4/PRODUCCIÓN/Tab Suivi Prod/SC4 TSP 2017.xlsm',
                                              data_only=True)
         else:
             doc = openpyxl.load_workbook(r'/home/ubuntu/3id2plus/SuiviJRU.xlsx', data_only=True)
@@ -146,7 +154,7 @@ def cargarDatosExcel(client):
                         'IPE_PM': hoja_principal.cell(row= celda.row, column= 8).value,
                         'ref_1era_PM': hoja_principal.cell(row= celda.row, column= 15).value,
                         'num_EL': calculoNumel(celda.row, hoja_principal),
-                        'cliente': 'SC1',
+                        'cliente': client,
                         'solo_arquetas': calculoArquetas(celda.row, hoja_principal), # gc, gc+p, p
                         'calles': calculoCalles(celda.row, hoja_principal),
                         'ref_cli': hoja_principal.cell(row= celda.row, column=79).value,
@@ -155,7 +163,7 @@ def cargarDatosExcel(client):
                     if fci_cell is not None:
                         if fci_cell[1] =='$':
                             dosier['fci_anterior'] = fci_cell
-                    dosier ['formulario'] = calculoFormulario(dosier['ciudad'], dosier['tipo'], hoja_formulario)
+                    dosier ['formulario'] = calculoFormulario(dosier['ciudad'], dosier['tipo'], hoja_formulario, client)
                     dosier['date_ini'] = calculoFechas(dosier['tipo'], 4, hoja_principal)
                     dosier['date_fin'] = calculoFechas(dosier['tipo'], 5, hoja_principal)
                     dosieres[dosier['nombre']] = dosier
@@ -214,7 +222,7 @@ def login(browser, client):
     print('login')
     elem = browser.find_element_by_id("username")
     elem2 = browser.find_element_by_id("password")
-    if client == 'SC01':
+    if client == 'SC1':
         elem.send_keys("michael.yniesta")
         time.sleep(1)
         elem2.send_keys("Scopelec92!" + Keys.RETURN)
@@ -222,11 +230,20 @@ def login(browser, client):
         elem.send_keys("LLWQ3863")
         time.sleep(1)
         elem2.send_keys("Reunion974*" + Keys.RETURN)
+    elif client == 'SC6':
+        elem.send_keys('lcosma@groupe-scopelec.fr')
+        time.sleep(1)
+        elem2.send_keys("Scopelec31*" + Keys.RETURN)
+    elif client == 'SC4':
+        elem.send_keys('faiza.kheda')
+        time.sleep(1)
+        elem2.send_keys("Scopelec03/" + Keys.RETURN)
     time.sleep(4)
 
 
 def boutique_operations(browser, d):
-    print('boutique operations')
+    'Rellena formulario con los datos del dosier para obtener el número FCI'
+    print('boutique operations ' + d['nombre'])
     dos_type = d['tipo']
     browser.get('https://espaceclient.orange-business.com/group/divop/boutique-operateurs')
     time.sleep(3)
@@ -515,14 +532,19 @@ def boutique_operations(browser, d):
         raise Exception(browser.find_element_by_css_selector('span.sfci_error:nth-child(2)').text)
     # fci = 'f123451234512'
     if 'fci_anterior' in d:
-        d['fci'] = fci + '\n' + d['fci_anterior']
+        d['fci_compuesto'] = fci + '\n' + d['fci_anterior']
+        d['fci'] = fci
     else:
         d['fci'] = fci
     time.sleep(4)
 
+
 def tsp_operations_1(dosier, ws):
 # operaciones despues de obtener FCI en el tsp
-    ws.Cells(dosier['row'], 40).Value = dosier['fci']
+    if 'fci_compuesto' in dosier:
+        ws.Cells(dosier['row'], 40).Value = dosier['fci_compuesto']
+    else:
+        ws.Cells(dosier['row'], 40).Value = dosier['fci']
     if dosier['tipo'] == 'SPL':
         # if 'v' in ws.Cells(dosier['row'], 65).Value:
         ws.Cells(dosier['row'], 65).Value = 'v1'
@@ -531,21 +553,36 @@ def tsp_operations_1(dosier, ws):
 
 
 def tsp_operations_2(dosier, ws):
-    pass
+    # Operaciones despues de hacer el primer depósito
+    ws.Cells(dosier['row'], 49).Value = 'v1'
+    ws.Cells(dosier['row'], 50).Value = 'DÉPOSÉ'
+    ws.Cells(dosier['row'], 51).Value = 'v1'
+    ws.Cells(dosier['row'], 52).Value = 'Déposée  en cours'
+    today = datetime.today().strftime("%d-%m-%y")
+    ws.Cells(dosier['row'], 53).Value = today
 
 
+def tsp_operations_3(row, ws, v):
+    # Operaciones después de hacer el segundo depósito
+    ws.Cells(row, 66).Value = 'DÉPOSÉ'
+    today = datetime.today().strftime("%d-%m-%y")
+    ws.Cells(row, 67).Value = today
+    ws.Cells(row, 68).Value = 'v' + v
+    ws.Cells(row, 69).Value = 'Déposée  en cours'
 
-def change_c3a(d, fci):
+
+def change_c3a(d, fci, client):
+    print('Cambiando c3a')
     pythoncom.CoInitialize()
     global destino
-    dosier_folder = d[:3] + ' ' + d[3:7]
-    ruta = os.getcwd() + os.sep
+    dosier_folder = d[:3] + ' ' + d[3:]
+    ruta = 'Z:\\03-PRODUCCION\\0.CAFT\\' + client + '\\PRODUCCIÓN\\PROD_Interna\\03-CTRL OK-A depositar' + os.sep
     try:
         for e in os.listdir(ruta):
             if dosier_folder in e:
                 dosier_folder = ruta + e + os.sep
         for e in os.listdir(dosier_folder):
-            if '_V1' in e:
+            if '_V' in e and 'RF' in e:
                 destino = dosier_folder + e + os.sep
         excel_file = destino + 'Fxxxxxxxxxxx_C3A.xls'
         excel = win32.gencache.EnsureDispatch('Excel.Application')
@@ -561,17 +598,19 @@ def change_c3a(d, fci):
         print('error al modificar la c3a')
 
 
-def change_dxf(d, fci):
+def change_dxf(d, fci, client):
+    # Llama a una macro de excel para que cambie el nombre de la capa y del bloque de texto en el dxf
+    print('Cambiando dxf')
     pythoncom.CoInitialize()
     global destino, dxf_file
     # Buscar ruta del archivo dxf
-    dosier_folder = d[:3] + ' ' + d[3:7]
-    ruta = os.getcwd() + os.sep
+    dosier_folder = d[:3] + ' ' + d[3:]
+    ruta = 'Z:\\03-PRODUCCION\\0.CAFT\\' + client + '\\PRODUCCIÓN\\PROD_Interna\\03-CTRL OK-A depositar' + os.sep
     for e in os.listdir(ruta):
         if dosier_folder in e:
             dosier_folder = ruta + e + os.sep
     for e in os.listdir(dosier_folder):
-        if '_V1' in e:
+        if '_V' in e and 'RF' in e:
             destino = dosier_folder + e
     for e in os.listdir(destino):
         if '_xxxxx' in e:
@@ -588,96 +627,135 @@ def change_dxf(d, fci):
 
     excel.Application.Run('macro.xlsm!OPGC_DXF_UPD')
     wb3.Close(True)
-    excel.Application.Quit()
+    for e in os.listdir(destino):
+        if 'Fxxxxxxxx' in e:
+            os.remove(destino + os.sep + e)
 
 
-#  TODO
-def mover_ficheros(d):
-    ruta = os.getcwd() + os.sep
-    origen = ruta + 'movido'
-    destino = 'C:\\Users\\josko\\PycharmProjects\\josko\\mover\\'
-    # for e in os.listdir(o):
-    #     if '1572' in e:
-    # os.rename("NOTICIAS.txt", "NEWS.txt")
-    # Si el segundo argumento corresponde al nombre de un archivo existente, su contenido es reemplazado; si es una carpeta, se lanzará la excepción OSError.
+def mover_ficheros(d, client, dep = 1):
+    # Despues de realizar el depósito mueve el dosier al estatuto correspondiente
+    print('Moviendo la carpeta')
+    dosier_folder = d[:3] + ' ' + d[3:]
+    ruta = 'Z:\\03-PRODUCCION\\0.CAFT\\' + client + '\\PRODUCCIÓN\\PROD_Interna\\03-CTRL OK-A depositar' + os.sep
+    if dep == 2:
+        ruta = 'Z:\\03-PRODUCCION\\0.CAFT\\' + client + '\\PRODUCCIÓN\\PROD_Interna\\06.9-CTRL OK-TFX a Depositar' + os.sep
+    for e in os.listdir(ruta):
+        if dosier_folder in e:
+            dosier_folder = ruta + e
+    origen = dosier_folder
+    destino = 'Z:\\03-PRODUCCION\\0.CAFT\\' + client + '\\PRODUCCIÓN\\PROD_Interna\\04-Anexos 1 Depositado' + os.sep
+    if dep == 2:
+        destino = 'Z:\\03-PRODUCCION\\0.CAFT\\' + client + '\\PRODUCCIÓN\\PROD_Interna\\07-TFX Depositados' + os.sep
     if os.path.exists(origen):
         ruta = shutil.move(origen, destino)
         print('El directorio ha sido movido a', ruta)
     else:
         print('El directorio origen no existe')
-    pass
 
 
-def zip_ficheros():
-    dosier = 'Das 1572'
-    fci = 'F92517310117'
-    ruta = os.getcwd() + os.sep
-    destino = ruta + '04-Anexos 1 Depositado' + os.sep
+def zip_ficheros(d, fci, client, dep = 1):
+    # Crea un zip del dxf y el c3a, y las carpetas FOA si hubiera
+    global destino, folder_rf
+    print('Comprimiendo en zip')
+    dosier_folder = d[:3] + ' ' + d[3:]
+    ruta = 'Z:\\03-PRODUCCION\\0.CAFT\\' + client + '\\PRODUCCIÓN\\PROD_Interna\\03-CTRL OK-A depositar' + os.sep
+    if dep == 2:
+        ruta = 'Z:\\03-PRODUCCION\\0.CAFT\\' + client + '\\PRODUCCIÓN\\PROD_Interna\\06.9-CTRL OK-TFX a Depositar' + os.sep
+    # destino = ruta + '04-Anexos 1 Depositado' + os.sep
 
+    for e in os.listdir(ruta):
+        if dosier_folder in e:
+            dosier_folder = ruta + e + os.sep
+
+    if dep == 2:
+        for e in os.listdir(dosier_folder):
+            if 'TFX_V' in e:
+                destino = dosier_folder + e + os.sep
+                folder_rf = e
+    else:
+        for e in os.listdir(dosier_folder):
+            if '_V' in e and 'RF' in e:
+                destino = dosier_folder + e + os.sep
+                folder_rf = e
+
+    # ZIP DEFLATED para hacer que se comprima, no solo que se guarde en un archivo .zip
+    zf = zipfile.ZipFile(destino + folder_rf + '.zip', mode='w', compression=zipfile.ZIP_DEFLATED)
     for e in os.listdir(destino):
-        if dosier in e:
-            destino = destino + e + os.sep + 'TFX_V1' + os.sep
-
-    zf = zipfile.ZipFile(destino + 'TFX_V1.zip', mode='w')
-    for e in os.listdir(destino):
-        if e != 'TFX_V1.zip':
+        if e != folder_rf + '.zip' and 'xxxxxxxx' not in e:
             zf.write(destino + e, basename(destino + e))
     zf.close()
-    pass
-    b = 2
 
 
-def depositar_webop(dosieres, browser):
-    for d in dosieres:
-        browser.get('https://espaceclient.orange-business.com/group/divop/historique-fci')
-        time.sleep(2)
-        main_window_handle = browser.current_window_handle
-        browser.switch_to_frame(browser.find_element_by_id('ece_iframe'))
-        fci_form = browser.find_element_by_xpath('/html/body/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/'
-                                                 'form/table[2]/tbody/tr/td/table[2]/tbody/tr[1]/td/table/tbody/tr'
-                                                 '[3]/td[2]/input')
-        fci_form.send_keys(dosieres[d]['fci'])
-        time.sleep(1)
-        browser.find_element_by_xpath('/html/body/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/form/table[2]/'
-                                      'tbody/tr/td/table[2]/tbody/tr[1]/td/table/tbody/tr[9]/td[2]/input[1]').clear()
-        time.sleep(1)
-        browser.find_element_by_xpath('/html/body/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/form/table[2]/'
-                                      'tbody/tr/td/table[2]/tbody/tr[2]/td/a').click()
-        time.sleep(2)
-        browser.find_element_by_xpath('/html/body/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/form/span/'
-                                      'table/tbody/tr[1]/td[1]/a').click()
-        time.sleep(2)
-        browser.find_element_by_xpath('/html/body/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/form/table[3]'
-                                      '/tbody/tr[1]/td/table/tbody/tr/td[1]/a[3]').click()
-        time.sleep(10)
-        browser.switch_to_window(browser.window_handles[1])
-        browser.refresh()
-        time.sleep(10)
-        # TODO Sustituir por el path del fichero que hay que subir
-        folder_path = 'C:\\Users\\josko\\PycharmProjects\\josko\\Sal 1666 STR\\RFA_V1\\'
-        file_path = folder_path + 'F12345678910_77409_678910.zip'
-        while True:
-            try:
-                input_file = browser.find_element_by_xpath('/html/body/div/div[3]/div/div/div[1]/div[2]/div/form/div[2]/div[2]/input')
-                input_file.send_keys(file_path)
-                break
-            except:
-                browser.refresh()
-                time.sleep(10)
+def depositar_webop(d, fci, browser, client, dep = 1):
+    print('Deposito webop')
+    global file_path, destino
+    dosier_folder = d[:3] + ' ' + d[3:]
+    browser.get('https://espaceclient.orange-business.com/group/divop/historique-fci')
+    time.sleep(2)
+    main_window_handle = browser.current_window_handle
+    browser.switch_to_frame(browser.find_element_by_id('ece_iframe'))
+    fci_form = browser.find_element_by_xpath('/html/body/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/'
+                                             'form/table[2]/tbody/tr/td/table[2]/tbody/tr[1]/td/table/tbody/tr'
+                                             '[3]/td[2]/input')
+    fci_form.send_keys(fci)
+    time.sleep(1)
+    browser.find_element_by_xpath('/html/body/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/form/table[2]/'
+                                  'tbody/tr/td/table[2]/tbody/tr[1]/td/table/tbody/tr[9]/td[2]/input[1]').clear()
+    time.sleep(1)
+    browser.find_element_by_xpath('/html/body/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/form/table[2]/'
+                                  'tbody/tr/td/table[2]/tbody/tr[2]/td/a').click()
+    time.sleep(2)
+    browser.find_element_by_xpath('/html/body/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/form/span/'
+                                  'table/tbody/tr[1]/td[1]/a').click()
+    time.sleep(2)
+    browser.find_element_by_xpath('/html/body/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/form/table[3]'
+                                  '/tbody/tr[1]/td/table/tbody/tr/td[1]/a[3]').click()
+    time.sleep(10)
+    browser.switch_to_window(browser.window_handles[1])
+    browser.refresh()
+    time.sleep(10)
 
-        time.sleep(3)
-        # TODO desbloquear esta linea para pulsar el boton de subir
-        # browser.find_element_by_xpath('/html/body/div/div[3]/div/div/div[2]/div[2]/div/div/table/tbody/tr[2]/td[7'
-        #                               ']/button[1]').click()
-#         Crear captura de pantalla
-        browser.get_screenshot_as_file(folder_path + 'capt upload ' + dosieres[d]['fci'] + '.png')
+    ruta = 'Z:\\03-PRODUCCION\\0.CAFT\\' + client + '\\PRODUCCIÓN\\PROD_Interna\\03-CTRL OK-A depositar' + os.sep
+    if dep == 2:
+        ruta = 'Z:\\03-PRODUCCION\\0.CAFT\\' + client + '\\PRODUCCIÓN\\PROD_Interna\\06.9-CTRL OK-TFX a Depositar' + os.sep
+    for e in os.listdir(ruta):
+        if dosier_folder in e:
+            dosier_folder = ruta + e + os.sep
+    if dep == 2:
+        for e in os.listdir(dosier_folder):
+            if 'TFX_V' in e:
+                destino = dosier_folder + e + os.sep
+    else:
+        for e in os.listdir(dosier_folder):
+            if '_V' in e and 'RF' in e:
+                destino = dosier_folder + e + os.sep
+
+    for e in os.listdir(destino):
+        if '.zip' in e:
+            file_path = destino + e
+
+    for i in range(5):
+        try:
+            input_file = browser.find_element_by_xpath('/html/body/div/div[3]/div/div/div[1]/div[2]/div/form/div[2]/div[2]/input')
+            input_file.send_keys(file_path)
+            break
+        except:
+            browser.refresh()
+            time.sleep(10)
+
+    time.sleep(3)
+    # TODO desbloquear esta linea para pulsar el boton de subir
+    browser.find_element_by_xpath('/html/body/div/div[3]/div/div/div[2]/div[2]/div/div/table/tbody/tr[2]/td[7'
+                                  ']/button[1]').click()
+    time.sleep(8)
+#   Crear captura de pantalla
+    browser.get_screenshot_as_file(destino + 'capt upload ' + fci + '.png')
 
 ###################################### COMIENZA EL PROCESO ##################################################
 
 def obtenerFCI(client):
     logging.basicConfig(filename='webop.log',level=logging.INFO,
                         format='%(asctime)s %(levelname)s: %(message)s', datefmt='%d/%m/%Y %I:%M:%S %p')
-
 
     # dosieres de prueba para no tener que cargar el excel continuamente
     # dosieres = {
@@ -689,7 +767,16 @@ def obtenerFCI(client):
     #             'Sus1230': {'es_aval': True, 'IPE_PM': 'FI-92073-001E', 'ref_1era_PM': 'F28968041116', 'date_fin': '18/01/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '14/12/2016', 'nombre': 'Sus1230', 'es_1ca': True, 'cliente': 'SC1', 'tipo': 'CPL', 'num_EL': 10}
     #
     # }
-    dosieres = {'Sal1666': {'fci':'F28988160217', 'otras_ciudades':None, 'nombre': 'Sal1666', 'num_EL': '361', 'ref_cli': 'SC1_EZA_PA_PB_77305_5870', 'ref_1era_PM': 'FI-77305-0001', 'es_1ca': True, 'solo_arquetas': 'gc', 'formulario': 'SC1_LE_MEE_SUR_SEINE_SPL', 'date_fin': '', 'tipo': 'SPL', 'cliente': 'SC1', 'es_aval': True, 'calles': ['RUE ALBERT SCHWEITZER'], 'IPE_PM': 'FI-77305-0001', 'row': 200, 'date_ini': '28/02/2017', 'ciudad': 'MONTEREAU-FAULT-YONNE'}}
+    dosieres = {'Sal77': {'fci': 'F05920220317', 'formulario': 'SCOP_RFA_TLS_31555_V3', 'nombre': 'Sal77', 'cliente': 'SC00', 'es_aval': True, 'solo_arquetas': 'gc+p', 'otras_ciudades': None, 'date_fin': '31/07/2017', 'ref_cli': 'SC6_TLS_AVALPMRCEM_FI_31555_0111', 'ref_1era_PM': 'A DEPOSER', 'ciudad': 'TOULOUSE', 'tipo': 'CPL', 'IPE_PM': 'FI-31555-0111', 'calles': ['ROUTE DE LAUNAGUET', 'RUE PAGES'], 'row': 55, 'num_EL': '300', 'date_ini': '11/04/2017', 'es_1ca': True}}
+    # pythoncom.CoInitialize()
+    #
+    # excel = win32.gencache.EnsureDispatch('Excel.Application')
+    # # excel.DisplayAlerts = True
+    # excel.EnableEvents = False
+    # wb = excel.Workbooks.Open(r'C:/Users/josko/PycharmProjects/josko/SuiviJRU.xlsm')
+    # ws = wb.Worksheets('Tab Suivi Prod')
+    # for d in dosieres:
+    #     tsp_operations_2(dosieres[d], ws)
 
 
     result = {}
@@ -701,24 +788,28 @@ def obtenerFCI(client):
     pythoncom.CoInitialize()
 
     excel = win32.gencache.EnsureDispatch('Excel.Application')
+    # excel.DisplayAlerts = True
+    excel.EnableEvents = False
     if os.name == 'nt':
         if client == 'SC1':
             wb = excel.Workbooks.Open(r'Z:/03-PRODUCCION/0.CAFT/SC1/PRODUCCIÓN/Tab Suivi Prod/SC1 TSP 2017.xlsm')
-        elif client == 'SC0':
-            wb = excel.Workbooks.Open(r'Z:/03-PRODUCCION/0.CAFT/SC00/PRODUCCIÓN/Tab Suivi Prod/SC00 TSP 2017 V2.xlsm')
+        elif client == 'SC00':
+            wb = excel.Workbooks.Open(r'Z:/03-PRODUCCION/0.CAFT/SC00/PRODUCCIÓN/Tab Suivi Prod/SC00 TSP 2017.xlsm')
+        elif client == 'SC6':
+            wb = excel.Workbooks.Open(r'Z:/03-PRODUCCION/0.CAFT/SC6/PRODUCCIÓN/Tab Suivi Prod/SC6 TSP 2017.xlsm')
+        elif client == 'SC4':
+            wb = excel.Workbooks.Open(r'Z:/03-PRODUCCION/0.CAFT/SC4/PRODUCCIÓN/Tab Suivi Prod/SC4 TSP 2017.xlsm')
         # wb = excel.Workbooks.Open(r'C:/Users/josko/PycharmProjects/josko/SuiviJRU.xlsm')
     else:
         wb = excel.Workbooks.Open(r'\home\ubuntu\3id2plus\SuiviJRU.xlsx')
-    # excel.Visible = True
+    excel.Visible = False
     ws = wb.Worksheets('Tab Suivi Prod')
     time.sleep(5)
 
     for d in dosieres:
         try:
-            #TODO tener en cuenta que si tiene fci anterior en el campo dosierd[d] hay mas de un fci cuando se inserta en distintos sitios
             # fci = 'F28988160217'
             # dosieres[d]['fci'] = fci
-            # mover_ficheros(dosieres[d])
             browser = set_up_browser()
             if dosieres[d]['otras_ciudades'] is not None:
                 raise Exception('Tiene más de una ciudad')
@@ -726,11 +817,20 @@ def obtenerFCI(client):
             boutique_operations(browser, dosieres[d])
             time.sleep(4)
             tsp_operations_1(dosieres[d], ws)
-    #         # change_c3a(d, dosieres[d]['fci'])
-    #
+            if dosieres[d]['tipo'] == 'CPL' or dosieres[d]['tipo'] == 'STR':
+                change_c3a(d, dosieres[d]['fci'], client)
+                change_dxf(d, dosieres[d]['fci'], client)
+                zip_ficheros(d, dosieres[d]['fci'], client)
+                depositar_webop(d, dosieres[d]['fci'], browser, client)
+                mover_ficheros(d, client)
+                tsp_operations_2(dosieres[d], ws)
+
         except Exception as ex:
-            logging.error('%s No ha podido completarse por: %s', dosieres[d]['nombre'], ex.args[0])
-            result[dosieres[d]['nombre']] = dosieres[d]['nombre'] + ' No ha podido completarse por: ' + ex.args[0]
+            try:
+                logging.error('%s No ha podido completarse por: %s', dosieres[d]['nombre'], ex.args[0])
+                result[dosieres[d]['nombre']] = dosieres[d]['nombre'] + ' No ha podido completarse por: ' + ex.args[0]
+            except Exception:
+                print('Error de argumentos en la excepción')
 
         else:
             logging.info('%s --> Se ha procesado correctamente: ', dosieres[d]['nombre'])
@@ -743,18 +843,70 @@ def obtenerFCI(client):
             time.sleep(5)
     print('Salvando excel')
     wb.Close(True)
-
-
-    # for d in dosieres:
-    #     change_dxf(d, dosieres[d]['fci'])
-
-    # browser = set_up_browser()
-    # login(browser)
-    # depositar_webop(dosieres, browser)
-    # browser.quit()
-
     # wb.SaveAs(r'C:\Users\josko\PycharmProjects\josko\SuiviJRU3.xlsx')
-    # excel.Application.Quit()
+    excel.Application.Quit()
     return result
 
 
+def depositar2(client):
+    result = {}
+    version = 1
+    ruta = 'Z:\\03-PRODUCCION\\0.CAFT\\' + client + '\\PRODUCCIÓN\\PROD_Interna\\06.9-CTRL OK-TFX a Depositar' + os.sep
+    dosieres = {}
+    dosieres = {'Sal77': {'fci': 'F05920220317', 'formulario': 'SCOP_RFA_TLS_31555_V3', 'nombre': 'Sal77', 'cliente': 'SC00', 'es_aval': True, 'solo_arquetas': 'gc+p', 'otras_ciudades': None, 'date_fin': '31/07/2017', 'ref_cli': 'SC6_TLS_AVALPMRCEM_FI_31555_0111', 'ref_1era_PM': 'A DEPOSER', 'ciudad': 'TOULOUSE', 'tipo': 'CPL', 'IPE_PM': 'FI-31555-0111', 'calles': ['ROUTE DE LAUNAGUET', 'RUE PAGES'], 'row': 55, 'num_EL': '300', 'date_ini': '11/04/2017', 'es_1ca': True}}
+    for e in os.listdir(ruta):
+        nom_dossier = e.split(sep= ' ')
+        dossier = nom_dossier[0] + nom_dossier[1]
+        dosieres[dossier] = {}
+        dossier_folder = ruta + e + os.sep
+        for f in os.listdir(dossier_folder):
+            if 'TFX_V' in f:
+                destino = dossier_folder + f + os.sep
+                version = f[5]
+        for f in os.listdir(destino):
+            if 'C3'in f:
+                fci = f[:12]
+                dosieres[dossier]['fci'] = fci
+
+    pythoncom.CoInitialize()
+    excel = win32.gencache.EnsureDispatch('Excel.Application')
+    excel.EnableEvents = False
+    if client == 'SC1':
+        wb = excel.Workbooks.Open(r'Z:/03-PRODUCCION/0.CAFT/SC1/PRODUCCIÓN/Tab Suivi Prod/SC1 TSP 2017.xlsm')
+    elif client == 'SC00':
+        wb = excel.Workbooks.Open(r'Z:/03-PRODUCCION/0.CAFT/SC00/PRODUCCIÓN/Tab Suivi Prod/SC00 TSP 2017.xlsm')
+    elif client == 'SC6':
+        wb = excel.Workbooks.Open(r'Z:/03-PRODUCCION/0.CAFT/SC6/PRODUCCIÓN/Tab Suivi Prod/SC6 TSP 2017.xlsm')
+    elif client == 'SC4':
+        wb = excel.Workbooks.Open(r'Z:/03-PRODUCCION/0.CAFT/SC4/PRODUCCIÓN/Tab Suivi Prod/SC4 TSP 2017.xlsm')
+    ws = wb.Worksheets('Tab Suivi Prod')
+    for d in dosieres:
+        print('Segundo depósito de ' + d)
+        browser = set_up_browser()
+        login(browser, client)
+
+        try:
+            zip_ficheros(d, dosieres[d]['fci'], client, 2)
+            depositar_webop(d, dosieres[d]['fci'], browser, client, 2)
+            mover_ficheros(d, client, 2)
+        except:
+            result[d] = 'El dosier' + d + ' no se ha depositado correctamente'
+        else:
+            for i in range(9, 1500):
+                if ws.Cells(i, 1).GetValue() == d:
+                    dosieres[d]['row'] = i
+                    break
+            try:
+                tsp_operations_3(dosieres[d]['row'], ws, version)
+                pass
+            except:
+                result[d] = 'El dosier' + d + ' se ha depositado bien pero no se ha encontrado en TSP 2017'
+            else:
+                result[d] = 'El dosier' + d + ' se ha procesado correctamente'
+        finally:
+            browser.quit()
+            time.sleep(5)
+    print('Salvando excel')
+    wb.Close(True)
+    excel.Application.Quit()
+    return result

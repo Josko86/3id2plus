@@ -21,6 +21,7 @@ from ezapa import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^obtenerfci/(?P<client>\w{0,50})/$', views.obtenerNumeroComanda, name='obtenerfci'),
+    url(r'^segundodeposito/(?P<client>\w{0,50})/$', views.segundoDeposito, name='segundodeposito'),
     url(r'^ipon/(?P<nra>\w{0,50})/$', views.ipon, name='ipon'),
     url(r'^prueba/(?P<nra>\w{0,50})/$', views.prueba, name='prueba')
 ]

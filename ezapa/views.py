@@ -3,11 +3,19 @@ from django.http import HttpResponse
 from django.template import Context, Template
 import templates
 from scripts.ipon import ejecutar_ipon
-from scripts.obtenfci import obtenerFCI
+from scripts.obtenfci import obtenerFCI, depositar2
+
 
 def obtenerNumeroComanda(request, client):
 
     result = obtenerFCI(client)
+    c = Context({'result': result})
+    return render(request, 'obtenerfci.html', c)
+
+
+def segundoDeposito(request, client):
+
+    result = depositar2(client)
     c = Context({'result': result})
     return render(request, 'obtenerfci.html', c)
 
