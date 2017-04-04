@@ -8,47 +8,52 @@ import time
 import logging
 import openpyxl
 import zipfile
-from datetime import datetime, date
+from datetime import datetime
 from os.path import basename
 import win32com.client as win32
 import pythoncom
 import shutil, os
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 
 
 # Funciones Utils
-def esAval(row, hp):
+from selenium.webdriver.support.wait import WebDriverWait
+
+
+def es_aval(row, hp):
     global aval
-    if hp.cell(row= row, column= 6).value == 'Aval PM':
+    if hp.cell(row=row, column=6).value == 'Aval PM':
         aval = True
-    elif hp.cell(row= row, column= 6).value == 'Amont PM':
+    elif hp.cell(row=row, column=6).value == 'Amont PM':
         aval = False
     return aval
 
 
-def calculoTipo(row, hp):
+def calculo_tipo(row, hp):
     global tipo
-    if hp.cell(row= row, column= 20).value == 'SIMPLE':
+    if hp.cell(row=row, column=20).value == 'SIMPLE':
         tipo = 'SPL'
-    elif hp.cell(row= row, column= 20).value == 'COMPLEXE':
+    elif hp.cell(row=row, column=20).value == 'COMPLEXE':
         tipo = 'CPL'
-    elif hp.cell(row= row, column= 20).value == 'STRUCTURANTE':
+    elif hp.cell(row=row, column=20).value == 'STRUCTURANTE':
         tipo = 'STR'
     return tipo
 
 
-def calculoFechas(tipo, col, hp):
+def calculo_fechas(tipo, col, hp):
     global date
     if tipo == 'SPL':
-        date = hp.cell(row= 1, column=col).value
+        date = hp.cell(row=1, column=col).value
     elif tipo == 'CPL':
-        date = hp.cell(row= 2, column=col).value
+        date = hp.cell(row=2, column=col).value
     elif tipo == 'STR':
         date = hp.cell(row=3, column=col).value
     date = date.strftime('%d/%m/%Y')
     return date
 
 
-def calculoArquetas(row, hp):
+def calculo_arquetas(row, hp):
     global arquetas
     if hp.cell(row=row, column=25).value != 0 and hp.cell(row=row, column=26).value == 0:
         arquetas = 'gc'
@@ -59,7 +64,7 @@ def calculoArquetas(row, hp):
     return arquetas
 
 
-def calculoNumel(row,hp):
+def calculo_numel(row, hp):
     global num_el
     if hp.cell(row=row, column=727).value == None:
         num_el = '0'
@@ -69,7 +74,7 @@ def calculoNumel(row,hp):
     return num_el
 
 
-def calculoCalles(row,hp):
+def calculo_calles(row, hp):
     global calles
     try:
         calles = []
@@ -81,27 +86,30 @@ def calculoCalles(row,hp):
             for c in otras_calles:
                 calles.append(c)
     except:
-        raise Exception('No tiene calles', hp.cell(row= row, column = 1).value)
+        raise Exception('No tiene calles', hp.cell(row=row, column=1).value)
     return calles
 
 
-def calculoFormulario(ciudad, tp, hf, client):
+def calculo_formulario(ciudad, tp, hf, client):
     global formulario
     for row in hf.iter_rows(min_row=1, max_col=1, max_row=hf.max_row):
         for celda in row:
             if celda.value == ciudad:
                 column = 9
-                if tp == 'CPL': column = 10
-                elif tp == 'STR': column = 11
+                if tp == 'CPL':
+                    column = 10
+                elif tp == 'STR':
+                    column = 11
                 if client == 'SC6': column += 1
                 formulario = hf.cell(row=celda.row, column=column).value
-    return  formulario
+    return formulario
 
 
-def cargarDatosExcel(client):
-# Carga de todos los datos necesarios del excel y los mete en un diccionario de dosieres
+def cargar_datos_excel(client):
+    # Carga de todos los datos necesarios del excel y los mete en un diccionario de dosieres
+    global doc
     print('Carga de todos los datos necesarios del excel y los mete en un diccionario de dosieres')
-# doc = openpyxl.load_workbook('SuiviJRU.xlsx')
+    # doc = openpyxl.load_workbook('SuiviJRU.xlsx')
 
     try:
         if os.name == 'nt':
@@ -110,8 +118,9 @@ def cargarDatosExcel(client):
                 doc = openpyxl.load_workbook(r'Z:/03-PRODUCCION/0.CAFT/SC1/PRODUCCIÓN/Tab Suivi Prod/SC1 TSP 2017.xlsm',
                                              data_only=True)
             elif client == 'SC00':
-                doc = openpyxl.load_workbook(r'Z:/03-PRODUCCION/0.CAFT/SC00/PRODUCCIÓN/Tab Suivi Prod/SC00 TSP 2017.xlsm',
-                                             data_only=True)
+                doc = openpyxl.load_workbook(
+                    r'Z:/03-PRODUCCION/0.CAFT/SC00/PRODUCCIÓN/Tab Suivi Prod/SC00 TSP 2017.xlsm',
+                    data_only=True)
             elif client == 'SC6':
                 doc = openpyxl.load_workbook(r'Z:/03-PRODUCCION/0.CAFT/SC6/PRODUCCIÓN/Tab Suivi Prod/SC6 TSP 2017.xlsm',
                                              data_only=True)
@@ -132,46 +141,47 @@ def cargarDatosExcel(client):
         for row in hoja_principal.iter_rows(min_row=1, max_col=1, max_row=hoja_principal.max_row):
             for celda in row:
                 fci_cell = hoja_principal.cell(row=celda.row, column=40).value
-                sacar_fci_simple = hoja_principal.cell(row=celda.row, column=20).value == 'SIMPLE' and\
-                                   (fci_cell == None or fci_cell[1] =='$' ) and celda.row != 1565
+                sacar_fci_simple = hoja_principal.cell(row=celda.row, column=20).value == 'SIMPLE' and \
+                                   (fci_cell == None or fci_cell[1] == '$') and celda.row != 1565
                 sacar_fci_cplstr = (hoja_principal.cell(row=celda.row, column=20).value == 'COMPLEXE' or
                                     hoja_principal.cell(row=celda.row, column=20).value == 'STRUCTURANTE') \
-                                   and (fci_cell == None or fci_cell[1] =='$' ) and \
+                                   and (fci_cell == None or fci_cell[1] == '$') and \
                                    hoja_principal.cell(row=celda.row, column=50).value == 'CTRL OK'
-                #TODO if celda.value in dosieres_act:  -->  Para seleccionar los dosieres que se hacen
-                if  (sacar_fci_cplstr or sacar_fci_simple) and \
+
+                if (sacar_fci_cplstr or sacar_fci_simple) and \
                         (hoja_principal.cell(row=celda.row, column=15).value != 'en attente' and
                                  hoja_principal.cell(row=celda.row, column=15).value != 'Not FCI') and \
                                 hoja_principal.cell(row=celda.row, column=3).value == '3ID2+':
-    #                   formulario en pestaña dex & pit y el numero fi aax   y 727 para la capacidad el
+                    #                   formulario en pestaña dex & pit y el numero fi aax   y 727 para la capacidad el
                     dosier = {
                         'nombre': celda.value,
-                        'ciudad': hoja_principal.cell(row= celda.row, column= 16).value,
-                        'otras_ciudades': hoja_principal.cell(row= celda.row, column= 17).value,
-                        'es_aval': esAval(celda.row, hoja_principal),
-                        'tipo': calculoTipo(celda.row, hoja_principal),
-                        'es_1ca': hoja_principal.cell(row= celda.row, column=19).value == '1er CA',
-                        'IPE_PM': hoja_principal.cell(row= celda.row, column= 8).value,
-                        'ref_1era_PM': hoja_principal.cell(row= celda.row, column= 15).value,
-                        'num_EL': calculoNumel(celda.row, hoja_principal),
+                        'ciudad': hoja_principal.cell(row=celda.row, column=16).value,
+                        'otras_ciudades': hoja_principal.cell(row=celda.row, column=17).value,
+                        'es_aval': es_aval(celda.row, hoja_principal),
+                        'tipo': calculo_tipo(celda.row, hoja_principal),
+                        'es_1ca': hoja_principal.cell(row=celda.row, column=19).value == '1er CA',
+                        'IPE_PM': hoja_principal.cell(row=celda.row, column=8).value,
+                        'ref_1era_PM': hoja_principal.cell(row=celda.row, column=15).value,
+                        'num_EL': calculo_numel(celda.row, hoja_principal),
                         'cliente': client,
-                        'solo_arquetas': calculoArquetas(celda.row, hoja_principal), # gc, gc+p, p
-                        'calles': calculoCalles(celda.row, hoja_principal),
-                        'ref_cli': hoja_principal.cell(row= celda.row, column=79).value,
+                        'solo_arquetas': calculo_arquetas(celda.row, hoja_principal),  # gc, gc+p, p
+                        'calles': calculo_calles(celda.row, hoja_principal),
+                        'ref_cli': hoja_principal.cell(row=celda.row, column=79).value,
                         'row': celda.row
                     }
                     if fci_cell is not None:
-                        if fci_cell[1] =='$':
+                        if fci_cell[1] == '$':
                             dosier['fci_anterior'] = fci_cell
-                    dosier ['formulario'] = calculoFormulario(dosier['ciudad'], dosier['tipo'], hoja_formulario, client)
-                    dosier['date_ini'] = calculoFechas(dosier['tipo'], 4, hoja_principal)
-                    dosier['date_fin'] = calculoFechas(dosier['tipo'], 5, hoja_principal)
+                    dosier['formulario'] = calculo_formulario(dosier['ciudad'], dosier['tipo'], hoja_formulario, client)
+                    dosier['date_ini'] = calculo_fechas(dosier['tipo'], 4, hoja_principal)
+                    dosier['date_fin'] = calculo_fechas(dosier['tipo'], 5, hoja_principal)
                     dosieres[dosier['nombre']] = dosier
-    except :
+    except:
         pass
     finally:
         doc = None
     return dosieres
+
 
 ############################################ EJEMPLO DOSIER ###########################
 # dosier : {
@@ -201,7 +211,15 @@ def set_up_browser():
     if os.name == 'nt':
         ############################# FIREFOX ###########################################
         binary = FirefoxBinary(r'C:\Program Files (x86)\Mozilla Firefox\firefox.exe')
-        browser = webdriver.Firefox(firefox_binary=binary)
+        # Crear un profile para omitir los cuadros de diálogo al descargar archivos
+        fp = webdriver.FirefoxProfile()
+        fp.set_preference('browser.download.folderList', 2)
+        fp.set_preference('browser.download.manager.showWhenStarting', False)
+        fp.set_preference('browser.download.dir', os.getcwd())
+        fp.set_preference('browser.helperApps.neverAsk.openFile', 'application/zip')
+        fp.set_preference('browser.helperApps.neverAsk.saveToDisk','application/zip')
+        fp.set_preference('browser.helperApps.alwaysAsk.force', False)
+        browser = webdriver.Firefox(firefox_binary=binary, firefox_profile=fp)
 
         ############################ PHANTOMJS ##########################################
         # path = r'C:\Users\josko\PycharmProjects\josko\scripts\phantomjs-2.1.1-windows\bin\phantomjs.exe'
@@ -210,13 +228,12 @@ def set_up_browser():
     else:
         browser = webdriver.PhantomJS()
 
-
-
     browser.get('https://dro.orange-business.com/authentification?target=https://espaceclient.orange-business.com/group'
-               '/divop/home?codeContexte=ece_divop&TYPE=33554433&REALMOID=06-00006a03-1ec3-1184-b5ad-5e0e0a63d064&'
-               'GUID=&SMAUTHREASON=0&METHOD=GET&SMAGENTNAME=-SM-hCJfMsHRC8Nvudq1lQDbznywak%2fg%2bYsE6nklHqOsEk8XmYpdaqDy'
-               'ezDHzkpWx6GU&TARGET=-SM-https%3a%2f%2fespaceclient%2eorange--business%2ecom%2fgroup%2fdivop%2fhome')
+                '/divop/home?codeContexte=ece_divop&TYPE=33554433&REALMOID=06-00006a03-1ec3-1184-b5ad-5e0e0a63d064&'
+                'GUID=&SMAUTHREASON=0&METHOD=GET&SMAGENTNAME=-SM-hCJfMsHRC8Nvudq1lQDbznywak%2fg%2bYsE6nklHqOsEk8XmYpdaqDy'
+                'ezDHzkpWx6GU&TARGET=-SM-https%3a%2f%2fespaceclient%2eorange--business%2ecom%2fgroup%2fdivop%2fhome')
     return browser
+
 
 def login(browser, client):
     print('login')
@@ -275,7 +292,7 @@ def boutique_operations(browser, d):
                                              ' > select:nth-child(1) > option:nth-child(2)')
     c.click()
     time.sleep(1)
-    browser.find_element_by_css_selector('a.sfci_blackb:nth-child(5)').click() #pulsamos en 'deposer a partir d'une...
+    browser.find_element_by_css_selector('a.sfci_blackb:nth-child(5)').click()  # pulsamos en 'deposer a partir d'une...
     # se abre una nueva ventana y hay que elegir el formulario que corresponda
     time.sleep(1)
     # signin_window_handle = None
@@ -296,7 +313,7 @@ def boutique_operations(browser, d):
     clickable_button.click()
 
     time.sleep(2)
-    valider_button = browser.find_element_by_css_selector('a.sfci_blackb:nth-child(2)') # click on button valider
+    valider_button = browser.find_element_by_css_selector('a.sfci_blackb:nth-child(2)')  # click on button valider
     valider_button.click()
     time.sleep(2)
     browser.switch_to.window(main_window_handle)
@@ -320,8 +337,9 @@ def boutique_operations(browser, d):
     if browser.name == 'phantomjs':
         browser.switch_to_frame('ece_iframe')
     time.sleep(1)
-    commande = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_pm_td_input '
-                                                    '> select:nth-child(1)')
+    commande = browser.find_element_by_css_selector(
+        '#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_pm_td_input '
+        '> select:nth-child(1)')
     commande.click()
     time.sleep(1)
 
@@ -336,7 +354,7 @@ def boutique_operations(browser, d):
         aval2.clear()
         time.sleep(1)
         if es_aval:
-            #opción marcada por defecto. No modificar el select, solo los 2 campos siguientes
+            # opción marcada por defecto. No modificar el select, solo los 2 campos siguientes
             browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_pm_td_input'
                                                  ' > select:nth-child(1) > option:nth-child(1)').click()
             aval_choice = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde'
@@ -349,9 +367,10 @@ def boutique_operations(browser, d):
             time.sleep(1)
             browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_'
                                                  'pm_td_input > select:nth-child(1) > option:nth-child(1)').click()
-            amont_choice = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_'
-                                                                'pm_td_input > select:nth-child(1) > option:nth-child(2)')
-            amont_choice.click()#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_pm_td_input > select:nth-child(1) > option:nth-child(2)
+            amont_choice = browser.find_element_by_css_selector(
+                '#\/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_'
+                'pm_td_input > select:nth-child(1) > option:nth-child(2)')
+            amont_choice.click()  # \/com\:commande\/gcblo\:contexte_com\/gcblo\:zone_cde_pm_td_input > select:nth-child(1) > option:nth-child(2)
 
         time.sleep(2)
         browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:cont_com\/gcblo\:cde_'
@@ -384,7 +403,8 @@ def boutique_operations(browser, d):
         #     Annadimos las calles que pasan por el recorrido
         for i in range(len(calles)):
             calle_form = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contenu_decl_trvx\/gcblo\:'
-                                                              'arteres_princ\['+str(i+1)+'\]_td_input > input:nth-child(1)')
+                                                              'arteres_princ\[' + str(
+                i + 1) + '\]_td_input > input:nth-child(1)')
             time.sleep(1)
             calle_form.clear()
             calle_form.send_keys(calles[i])
@@ -444,8 +464,9 @@ def boutique_operations(browser, d):
             af.click()
             time.sleep(1)
             bf.send_keys(IPE_PM)
-            cf = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:type_cde_td_input > '
-                                                      'select:nth-child(1)')
+            cf = browser.find_element_by_css_selector(
+                '#\/com\:commande\/gcblo\:contexte_com\/gcblo\:type_cde_td_input > '
+                'select:nth-child(1)')
             cf.click()
             time.sleep(1)
             c1 = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:contexte_com\/gcblo\:type_cde_td_input'
@@ -478,7 +499,8 @@ def boutique_operations(browser, d):
 
         time.sleep(2)
         # Si solo arquetas se deja por defecto GC, si arquetas + poteaux se pone GC et apus aeris
-        browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:cont_com\/gcblo\:cde_concerne > option:nth-child(1)').click()
+        browser.find_element_by_css_selector(
+            '#\/com\:commande\/gcblo\:cont_com\/gcblo\:cde_concerne > option:nth-child(1)').click()
         select_postes = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:cont_com\/gcblo\:cde_'
                                                              'concerne > option:nth-child(2)')
         if solo_arquetas == 'gc+p':
@@ -495,8 +517,10 @@ def boutique_operations(browser, d):
         if dos_type == 'CPL':
             diferencial_tipo = 'contenu_declaration_travaux'
 
-        form_fecha_ini = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:' + diferencial_tipo + '\/gcblo\:date_debut_trvx')
-        form_fecha_fin = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:' + diferencial_tipo + '\/gcblo\:date_fin_trvx_td_input > input:nth-child(1)')
+        form_fecha_ini = browser.find_element_by_css_selector(
+            '#\/com\:commande\/gcblo\:' + diferencial_tipo + '\/gcblo\:date_debut_trvx')
+        form_fecha_fin = browser.find_element_by_css_selector(
+            '#\/com\:commande\/gcblo\:' + diferencial_tipo + '\/gcblo\:date_fin_trvx_td_input > input:nth-child(1)')
         time.sleep(1)
         form_fecha_ini.clear()
         form_fecha_ini.send_keys(fecha_ini)
@@ -507,13 +531,16 @@ def boutique_operations(browser, d):
         time.sleep(1)
         # Annadimos las calles que pasan por el recorrido
         for i in range(len(calles)):
-            calle_form = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:' + diferencial_tipo + '\/gcblo\:arteres_princ\[' + str(i + 1) + '\]_td_input > input:nth-child(1)')
+            calle_form = browser.find_element_by_css_selector(
+                '#\/com\:commande\/gcblo\:' + diferencial_tipo + '\/gcblo\:arteres_princ\[' + str(
+                    i + 1) + '\]_td_input > input:nth-child(1)')
             time.sleep(1)
             calle_form.clear()
             calle_form.send_keys(calles[i])
             if i < len(calles) - 1:
                 time.sleep(1)
-                add_button = browser.find_element_by_css_selector('#\/com\:commande\/gcblo\:' + diferencial_tipo + '\/gcblo\:arteres_princ\[1\]_td_label1 > a:nth-child(1) > img:nth-child(1)')
+                add_button = browser.find_element_by_css_selector(
+                    '#\/com\:commande\/gcblo\:' + diferencial_tipo + '\/gcblo\:arteres_princ\[1\]_td_label1 > a:nth-child(1) > img:nth-child(1)')
                 add_button.click()
 
     ref_cli_form = browser.find_element_by_css_selector('#\/com\:commande\/com\:ref_client')
@@ -540,7 +567,7 @@ def boutique_operations(browser, d):
 
 
 def tsp_operations_1(dosier, ws):
-# operaciones despues de obtener FCI en el tsp
+    # operaciones despues de obtener FCI en el tsp
     if 'fci_compuesto' in dosier:
         ws.Cells(dosier['row'], 40).Value = dosier['fci_compuesto']
     else:
@@ -616,7 +643,6 @@ def change_dxf(d, fci, client):
         if '_xxxxx' in e:
             dxf_file = e
 
-
     excel = win32.gencache.EnsureDispatch('Excel.Application')
     excel.Application.Visible = True
     wb3 = excel.Workbooks.Open(r'C:/Users/josko/PycharmProjects/josko/macro.xlsm')
@@ -632,13 +658,14 @@ def change_dxf(d, fci, client):
             os.remove(destino + os.sep + e)
 
 
-def mover_ficheros(d, client, dep = 1):
+def mover_ficheros(d, client, dep=1):
     # Despues de realizar el depósito mueve el dosier al estatuto correspondiente
     print('Moviendo la carpeta')
     dosier_folder = d[:3] + ' ' + d[3:]
     ruta = 'Z:\\03-PRODUCCION\\0.CAFT\\' + client + '\\PRODUCCIÓN\\PROD_Interna\\03-CTRL OK-A depositar' + os.sep
     if dep == 2:
-        ruta = 'Z:\\03-PRODUCCION\\0.CAFT\\' + client + '\\PRODUCCIÓN\\PROD_Interna\\06.9-CTRL OK-TFX a Depositar' + os.sep
+        ruta = 'Z:\\03-PRODUCCION\\0.CAFT\\' + client + '\\PRODUCCIÓN\\PROD_Interna\\06.9-CTRL OK-TFX a Depositar' + \
+               os.sep
     for e in os.listdir(ruta):
         if dosier_folder in e:
             dosier_folder = ruta + e
@@ -653,14 +680,15 @@ def mover_ficheros(d, client, dep = 1):
         print('El directorio origen no existe')
 
 
-def zip_ficheros(d, fci, client, dep = 1):
+def zip_ficheros(d, fci, client, dep=1):
     # Crea un zip del dxf y el c3a, y las carpetas FOA si hubiera
     global destino, folder_rf
     print('Comprimiendo en zip')
     dosier_folder = d[:3] + ' ' + d[3:]
     ruta = 'Z:\\03-PRODUCCION\\0.CAFT\\' + client + '\\PRODUCCIÓN\\PROD_Interna\\03-CTRL OK-A depositar' + os.sep
     if dep == 2:
-        ruta = 'Z:\\03-PRODUCCION\\0.CAFT\\' + client + '\\PRODUCCIÓN\\PROD_Interna\\06.9-CTRL OK-TFX a Depositar' + os.sep
+        ruta = 'Z:\\03-PRODUCCION\\0.CAFT\\' + client + '\\PRODUCCIÓN\\PROD_Interna\\06.9-CTRL OK-TFX a Depositar' + \
+               os.sep
     # destino = ruta + '04-Anexos 1 Depositado' + os.sep
 
     for e in os.listdir(ruta):
@@ -686,7 +714,8 @@ def zip_ficheros(d, fci, client, dep = 1):
     zf.close()
 
 
-def depositar_webop(d, fci, browser, client, dep = 1):
+def depositar_webop(d, fci, browser, client, dep=1):
+    # Entra en la página para depositar y sube el ZIP del dosier
     print('Deposito webop')
     global file_path, destino
     dosier_folder = d[:3] + ' ' + d[3:]
@@ -717,7 +746,8 @@ def depositar_webop(d, fci, browser, client, dep = 1):
 
     ruta = 'Z:\\03-PRODUCCION\\0.CAFT\\' + client + '\\PRODUCCIÓN\\PROD_Interna\\03-CTRL OK-A depositar' + os.sep
     if dep == 2:
-        ruta = 'Z:\\03-PRODUCCION\\0.CAFT\\' + client + '\\PRODUCCIÓN\\PROD_Interna\\06.9-CTRL OK-TFX a Depositar' + os.sep
+        ruta = 'Z:\\03-PRODUCCION\\0.CAFT\\' + client + '\\PRODUCCIÓN\\PROD_Interna\\06.9-CTRL OK-TFX a Depositar' + \
+               os.sep
     for e in os.listdir(ruta):
         if dosier_folder in e:
             dosier_folder = ruta + e + os.sep
@@ -734,54 +764,83 @@ def depositar_webop(d, fci, browser, client, dep = 1):
         if '.zip' in e:
             file_path = destino + e
 
-    for i in range(5):
+            #   Repite este bucle porque a veces no carga bien la página y no sube bien el archivo
+    for i in range(7):
         try:
-            input_file = browser.find_element_by_xpath('/html/body/div/div[3]/div/div/div[1]/div[2]/div/form/div[2]/div[2]/input')
+            input_file = browser.find_element_by_id('ufile')
             input_file.send_keys(file_path)
             break
         except:
             browser.refresh()
-            time.sleep(10)
+            time.sleep(8)
 
     time.sleep(3)
-    # TODO desbloquear esta linea para pulsar el boton de subir
+    # boton de subir
     browser.find_element_by_xpath('/html/body/div/div[3]/div/div/div[2]/div[2]/div/div/table/tbody/tr[2]/td[7'
                                   ']/button[1]').click()
     time.sleep(8)
-#   Crear captura de pantalla
+    #   Crear captura de pantalla
     browser.get_screenshot_as_file(destino + 'capt upload ' + fci + '.png')
+
+
+def descargar_zip_tfx(d, fci, browser, client):
+    time.sleep(2)
+    browser.get('https://espaceclient.orange-business.com/group/divop/visualiser-vos-fichiers-deposes')
+    time.sleep(7)
+    WebDriverWait(browser, 10).until(EC.frame_to_be_available_and_switch_to_it((By.ID, 'ece_iframe')))
+    WebDriverWait(browser, 10).until\
+        (EC.presence_of_element_located((By.XPATH, '/html/body/div/div[3]/div[2]/table/tbody/tr[1]/th[7]/input')))
+    fci_form = browser.find_element_by_xpath('/html/body/div/div[3]/div[2]/table/tbody/tr[1]/th[7]/input')
+    fci_form.send_keys('%' + fci)
+    time.sleep(2)
+    WebDriverWait(browser, 25).until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(), '_" + fci + "')]")))
+    browser.find_element_by_xpath('/html/body/div/div[3]/div[2]/table/tbody/tr[2]/td[1]/button').click()
+    time.sleep(8)
+
+
+def mover_zip_descargado(fci, client):
+    origen = None
+    print('Moviendo el zip')
+    ruta = os.getcwd() + os.sep
+    for i in range(5):
+        for e in os.listdir(ruta):
+            if fci in e:
+                origen = ruta + e
+                break
+        if origen != None:
+            break
+        else:
+            time.sleep(2)
+    destino = 'Z:\\03-PRODUCCION\\0.CAFT\\' + client + '\\PRODUCCIÓN\\PROD_Interna\\11- GCB1_TFX\\ENVIAR' + os.sep
+    if os.path.exists(origen):
+        ruta = shutil.move(origen, destino)
+        print('El fichero ha sido movido a', ruta)
+    else:
+        print('El fichero zip no existe')
 
 ###################################### COMIENZA EL PROCESO ##################################################
 
-def obtenerFCI(client):
-    logging.basicConfig(filename='webop.log',level=logging.INFO,
+def obtener_fci(client):
+    # Carga los datos del excel y se mete en WebOP para obtener el número FCI, si es STR o CPL realiza el primer depósito
+    global wb
+    logging.basicConfig(filename='webop.log', level=logging.INFO,
                         format='%(asctime)s %(levelname)s: %(message)s', datefmt='%d/%m/%Y %I:%M:%S %p')
 
     # dosieres de prueba para no tener que cargar el excel continuamente
     # dosieres = {
-    #             'Sus1314': {'es_aval': True, 'IPE_PM': 'FI-92073-0023', 'ref_1era_PM': 'A DEPOSER', 'date_fin': '18/04/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '28/12/2016', 'nombre': 'Sus1314', 'es_1ca': True, 'cliente': 'SC1', 'tipo': 'STR', 'num_EL': 38},
-    #             'Sus1136': {'es_aval': True, 'IPE_PM': 'FI-92073-0017', 'ref_1era_PM': 'F34837031016', 'date_fin': '18/01/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '14/12/2016', 'nombre': 'Sus1136', 'es_1ca': False, 'cliente': 'SC1', 'tipo': 'CPL', 'num_EL': 18},
-    #             'Sus1269': {'es_aval': False, 'IPE_PM': None, 'ref_1era_PM': None, 'date_fin': '18/01/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '14/12/2016', 'nombre': 'Sus1269', 'es_1ca': False, 'cliente': 'SC1', 'tipo': 'CPL', 'num_EL': 0},
-    #             'Moe993': {'es_aval': False, 'IPE_PM': None, 'ref_1era_PM': None, 'date_fin': '18/04/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'MONTEREAU-FAULT-YONNE', 'date_ini': '28/12/2016', 'nombre': 'Moe993', 'es_1ca': False, 'cliente': 'SC1', 'tipo': 'STR', 'num_EL': 0},
-    #             'Cly1345': {'es_aval': False, 'IPE_PM': None, 'ref_1era_PM': None, 'date_fin': '03/01/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'CLICHY', 'date_ini': '06/12/2016', 'nombre': 'Cly1345', 'es_1ca': False, 'cliente': 'SC1', 'tipo': 'SPL', 'num_EL': 17},
-    #             'Sus1230': {'es_aval': True, 'IPE_PM': 'FI-92073-001E', 'ref_1era_PM': 'F28968041116', 'date_fin': '18/01/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '14/12/2016', 'nombre': 'Sus1230', 'es_1ca': True, 'cliente': 'SC1', 'tipo': 'CPL', 'num_EL': 10}
-    #
+    #             'Ali195': {'fci': 'F31344040417', 'row': 91, 'es_aval': True, 'IPE_PM': 'FI-92073-0023', 'ref_1era_PM': 'A DEPOSER', 'date_fin': '18/04/2017', 'calles': ['rue del percebe', 'calle street', 'callejon hammer'], 'ref_cli': '', 'solo_arquetas': True, 'ciudad': 'SURESNES', 'date_ini': '28/12/2016', 'nombre': 'Sus1314', 'es_1ca': True, 'cliente': 'SC1', 'tipo': 'STR', 'num_EL': 38}
     # }
-    dosieres = {'Sal77': {'fci': 'F05920220317', 'formulario': 'SCOP_RFA_TLS_31555_V3', 'nombre': 'Sal77', 'cliente': 'SC00', 'es_aval': True, 'solo_arquetas': 'gc+p', 'otras_ciudades': None, 'date_fin': '31/07/2017', 'ref_cli': 'SC6_TLS_AVALPMRCEM_FI_31555_0111', 'ref_1era_PM': 'A DEPOSER', 'ciudad': 'TOULOUSE', 'tipo': 'CPL', 'IPE_PM': 'FI-31555-0111', 'calles': ['ROUTE DE LAUNAGUET', 'RUE PAGES'], 'row': 55, 'num_EL': '300', 'date_ini': '11/04/2017', 'es_1ca': True}}
-    # pythoncom.CoInitialize()
-    #
-    # excel = win32.gencache.EnsureDispatch('Excel.Application')
-    # # excel.DisplayAlerts = True
-    # excel.EnableEvents = False
-    # wb = excel.Workbooks.Open(r'C:/Users/josko/PycharmProjects/josko/SuiviJRU.xlsm')
-    # ws = wb.Worksheets('Tab Suivi Prod')
-    # for d in dosieres:
-    #     tsp_operations_2(dosieres[d], ws)
-
+    # dosieres = {
+    #     'Sal77': {'fci': 'F05920220317', 'formulario': 'SCOP_RFA_TLS_31555_V3', 'nombre': 'Sal77', 'cliente': 'SC00',
+    #               'es_aval': True, 'solo_arquetas': 'gc+p', 'otras_ciudades': None, 'date_fin': '31/07/2017',
+    #               'ref_cli': 'SC6_TLS_AVALPMRCEM_FI_31555_0111', 'ref_1era_PM': 'A DEPOSER', 'ciudad': 'TOULOUSE',
+    #               'tipo': 'CPL', 'IPE_PM': 'FI-31555-0111', 'calles': ['ROUTE DE LAUNAGUET', 'RUE PAGES'], 'row': 55,
+    #               'num_EL': '300', 'date_ini': '11/04/2017', 'es_1ca': True}}
 
     result = {}
     try:
-        dosieres = cargarDatosExcel(client)
+        dosieres = cargar_datos_excel(client)
+        pass
     except Exception as ex:
         logging.error('No han podido cargarse los datos del excel porque: %s', ex.args[0])
         result[ex.args[1]] = ex.args[1] + ' ' + ex.args[0]
@@ -799,7 +858,7 @@ def obtenerFCI(client):
             wb = excel.Workbooks.Open(r'Z:/03-PRODUCCION/0.CAFT/SC6/PRODUCCIÓN/Tab Suivi Prod/SC6 TSP 2017.xlsm')
         elif client == 'SC4':
             wb = excel.Workbooks.Open(r'Z:/03-PRODUCCION/0.CAFT/SC4/PRODUCCIÓN/Tab Suivi Prod/SC4 TSP 2017.xlsm')
-        # wb = excel.Workbooks.Open(r'C:/Users/josko/PycharmProjects/josko/SuiviJRU.xlsm')
+            # wb = excel.Workbooks.Open(r'C:/Users/josko/PycharmProjects/josko/SuiviJRU.xlsm')
     else:
         wb = excel.Workbooks.Open(r'\home\ubuntu\3id2plus\SuiviJRU.xlsx')
     excel.Visible = False
@@ -849,13 +908,29 @@ def obtenerFCI(client):
 
 
 def depositar2(client):
+
+    # Realiza el segundo depósito de los dosieres que estan en la carpeta 6.9
+    print('segundo depósito')
+    global destino
+    # dosieres = {
+    #     'Sal77': {'fci': 'F05920220317', 'formulario': 'SCOP_RFA_TLS_31555_V3', 'nombre': 'Sal77', 'cliente': 'SC00',
+    #               'es_aval': True, 'solo_arquetas': 'gc+p', 'otras_ciudades': None, 'date_fin': '31/07/2017',
+    #               'ref_cli': 'SC6_TLS_AVALPMRCEM_FI_31555_0111', 'ref_1era_PM': 'A DEPOSER', 'ciudad': 'TOULOUSE',
+    #               'tipo': 'CPL', 'IPE_PM': 'FI-31555-0111', 'calles': ['ROUTE DE LAUNAGUET', 'RUE PAGES'], 'row': 55,
+    #               'num_EL': '300', 'date_ini': '11/04/2017', 'es_1ca': True}}
+    # for d in dosieres:
+    #     browser = set_up_browser()
+    #     login(browser, client)
+    #     descargar_zip_tfx(d, dosieres[d]['fci'], browser, client)
+    #     mover_zip_descargado(dosieres[d]['fci'], client)
+
     result = {}
     version = 1
     ruta = 'Z:\\03-PRODUCCION\\0.CAFT\\' + client + '\\PRODUCCIÓN\\PROD_Interna\\06.9-CTRL OK-TFX a Depositar' + os.sep
     dosieres = {}
-    dosieres = {'Sal77': {'fci': 'F05920220317', 'formulario': 'SCOP_RFA_TLS_31555_V3', 'nombre': 'Sal77', 'cliente': 'SC00', 'es_aval': True, 'solo_arquetas': 'gc+p', 'otras_ciudades': None, 'date_fin': '31/07/2017', 'ref_cli': 'SC6_TLS_AVALPMRCEM_FI_31555_0111', 'ref_1era_PM': 'A DEPOSER', 'ciudad': 'TOULOUSE', 'tipo': 'CPL', 'IPE_PM': 'FI-31555-0111', 'calles': ['ROUTE DE LAUNAGUET', 'RUE PAGES'], 'row': 55, 'num_EL': '300', 'date_ini': '11/04/2017', 'es_1ca': True}}
+    # dosieres = {'Sal77': {'fci': 'F05920220317', 'formulario': 'SCOP_RFA_TLS_31555_V3', 'nombre': 'Sal77', 'cliente': 'SC00', 'es_aval': True, 'solo_arquetas': 'gc+p', 'otras_ciudades': None, 'date_fin': '31/07/2017', 'ref_cli': 'SC6_TLS_AVALPMRCEM_FI_31555_0111', 'ref_1era_PM': 'A DEPOSER', 'ciudad': 'TOULOUSE', 'tipo': 'CPL', 'IPE_PM': 'FI-31555-0111', 'calles': ['ROUTE DE LAUNAGUET', 'RUE PAGES'], 'row': 55, 'num_EL': '300', 'date_ini': '11/04/2017', 'es_1ca': True}}
     for e in os.listdir(ruta):
-        nom_dossier = e.split(sep= ' ')
+        nom_dossier = e.split(sep=' ')
         dossier = nom_dossier[0] + nom_dossier[1]
         dosieres[dossier] = {}
         dossier_folder = ruta + e + os.sep
@@ -864,7 +939,7 @@ def depositar2(client):
                 destino = dossier_folder + f + os.sep
                 version = f[5]
         for f in os.listdir(destino):
-            if 'C3'in f:
+            if 'C3' in f:
                 fci = f[:12]
                 dosieres[dossier]['fci'] = fci
 
@@ -888,21 +963,32 @@ def depositar2(client):
         try:
             zip_ficheros(d, dosieres[d]['fci'], client, 2)
             depositar_webop(d, dosieres[d]['fci'], browser, client, 2)
-            mover_ficheros(d, client, 2)
         except:
-            result[d] = 'El dosier' + d + ' no se ha depositado correctamente'
+            result[d] = 'El dosier ' + d + ' no se ha depositado correctamente'
         else:
-            for i in range(9, 1500):
-                if ws.Cells(i, 1).GetValue() == d:
-                    dosieres[d]['row'] = i
-                    break
             try:
-                tsp_operations_3(dosieres[d]['row'], ws, version)
+                descargar_zip_tfx(d, dosieres[d]['fci'], browser, client)
+                mover_zip_descargado(dosieres[d]['fci'], client)
                 pass
             except:
-                result[d] = 'El dosier' + d + ' se ha depositado bien pero no se ha encontrado en TSP 2017'
+                result[d] = 'En el dosier ' + d + ' no se ha descargado el .zip o no se ha movido a la carpeta'
             else:
-                result[d] = 'El dosier' + d + ' se ha procesado correctamente'
+                try:
+                    mover_ficheros(d, client, 2)
+                except:
+                    result[d] = 'El dosier ' + d + ' ha fallado al mover las carpetas'
+                else:
+                    for i in range(9, 1500):
+                        if ws.Cells(i, 1).GetValue() == d:
+                            dosieres[d]['row'] = i
+                            break
+                    try:
+                        tsp_operations_3(dosieres[d]['row'], ws, version)
+                        pass
+                    except:
+                        result[d] = 'El dosier ' + d + ' se ha depositado bien pero no se ha encontrado en TSP 2017'
+                    else:
+                        result[d] = 'El dosier ' + d + ' se ha procesado correctamente'
         finally:
             browser.quit()
             time.sleep(5)

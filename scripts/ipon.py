@@ -1,3 +1,4 @@
+import ctypes
 import os
 
 from pywin.tools import browser
@@ -8,7 +9,11 @@ import time
 import win32com.client
 import win32api, win32con
 import pythoncom
+import re
 import openpyxl
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 
 pythoncom.CoInitialize()
 shell = win32com.client.Dispatch("WScript.Shell")
@@ -18,8 +23,9 @@ CTW = 2
 WX = 2213
 WY = 274
 
+
 def win32_click(x, y):
-    win32api.SetCursorPos((x, y))
+    ctypes.windll.user32.SetCursorPos(x, y)
     time.sleep(1)
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, x, y, 0, 0)
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, x, y, 0, 0)
@@ -74,6 +80,7 @@ def select_imb_con_pt(browser, inmueble, frame2):
     id_inmuble_form = browser.find_element_by_xpath(
         '/html/body/div[1]/div[1]/div/form[1]/div/table/tbody/tr[2]/td[1]/table/tbody/tr[1]/td/div[1]/table/tbody/tr/td[3]/font/div/input')
     time.sleep(1)
+    id_inmuble_form.clear()
     id_inmuble_form.send_keys(inmueble)
     shell.SendKeys("{ENTER}", 0)
     time.sleep(8)
@@ -88,9 +95,10 @@ def select_imb_con_pt(browser, inmueble, frame2):
     time.sleep(1)
 
 
-def select_pt_in_imb(browser, frame2, pt):
+def select_pt_in_imb(browser, frame2, pt, cable_interno = True):
     row_pt = browser.find_element_by_xpath("//*[contains(text(), '" + pt + "')]")
     row_parent = row_pt.find_element_by_xpath('..')
+    if cable_interno: row_parent = row_parent.find_element_by_xpath('..')
     pt_selected = row_parent.find_element_by_xpath('td[1]').click()
     time.sleep(2)
     browser.switch_to_default_content()
@@ -99,6 +107,80 @@ def select_pt_in_imb(browser, frame2, pt):
     time.sleep(1)
     browser.find_element_by_xpath('/html/body/form/div[1]/div/a').click()
     time.sleep(1)
+
+
+def select_in_out_cable(browser):
+    wait = WebDriverWait(browser, 10)
+    browser.find_element_by_xpath(
+        '/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[1]/td[1]/input').click()
+    time.sleep(1)
+    main_window = browser.current_window_handle
+    browser.find_element_by_xpath(
+        '/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/div[1]/table/thead/tr/th[3]/table/tbody/tr/td[3]/a').click()
+    wait.until(EC.number_of_windows_to_be(2))
+    signin_window_handle = [window for window in browser.window_handles if window != main_window][0]
+    browser.switch_to.window(signin_window_handle)
+    time.sleep(3)
+    frame = browser.find_element_by_xpath('/html/frameset/frame[1]')
+    frame2 = browser.find_element_by_xpath('/html/frameset/frame[2]')
+    browser.switch_to_frame(frame)
+    time.sleep(2)
+    i = 1
+    while True:
+        b = browser.find_element_by_xpath(
+            '/html/body/div/div/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[' + str(i) + ']/td[3]').text
+        if b == '' and browser.find_element_by_xpath(
+                                '/html/body/div/div/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[' + str(
+                            i) + ']/td[4]').text == 'Sortie':
+            browser.find_element_by_xpath(
+                '/html/body/div/div/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[' + str(i) + ']/td[1]').click()
+            break
+        i += 1
+    time.sleep(2)
+    browser.switch_to_default_content()
+    time.sleep(1)
+    browser.switch_to_frame(frame2)
+    time.sleep(1)
+    browser.find_element_by_xpath('/html/body/form/div[1]/div/a').click()
+    time.sleep(1)
+    browser.switch_to_window(main_window)
+    time.sleep(3)
+    browser.find_element_by_xpath(
+        '/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[3]/td[1]/input').click()
+    time.sleep(1)
+    browser.find_element_by_xpath(
+        '/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/div[1]/table/thead/tr/th[3]/table/tbody/tr/td[3]/a').click()
+    wait.until(EC.number_of_windows_to_be(2))
+    signin_window_handle = [window for window in browser.window_handles if window != main_window][0]
+    browser.switch_to.window(signin_window_handle)
+    time.sleep(3)
+    frame = browser.find_element_by_xpath('/html/frameset/frame[1]')
+    frame2 = browser.find_element_by_xpath('/html/frameset/frame[2]')
+    browser.switch_to_frame(frame)
+    time.sleep(2)
+    i = 1
+    while True:
+        b = browser.find_element_by_xpath(
+            '/html/body/div/div/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[' + str(i) + ']/td[3]').text
+        if b == '' and browser.find_element_by_xpath(
+                                '/html/body/div/div/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[' + str(
+                            i) + ']/td[4]').text == 'Entrée':
+            browser.find_element_by_xpath(
+                '/html/body/div/div/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[' + str(i) + ']/td[1]').click()
+            break
+        i += 1
+    time.sleep(2)
+    browser.switch_to_default_content()
+    time.sleep(1)
+    browser.switch_to_frame(frame2)
+    time.sleep(1)
+    browser.find_element_by_xpath('/html/body/form/div[1]/div/a').click()
+    wait.until(EC.number_of_windows_to_be(1))
+    browser.switch_to_window(main_window)
+    time.sleep(3)
+    # browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[1]/tbody/tr/td[2]/a').click()
+    # time.sleep(2)
+    # browser.find_element_by_xpath('/html/body/div/div[1]/table/tbody/tr[3]/td/table/tbody/tr/td/div[1]/table/tbody/tr/td[2]/a').click()
 
 def get_data():
     """
@@ -170,7 +252,7 @@ def get_data():
     pythoncom.CoInitialize()
     excel = win32com.client.gencache.EnsureDispatch('Excel.Application')
     excel.EnableEvents = False
-    wb = excel.Workbooks.Open(r'C:\Users\josko\PycharmProjects\josko\inmueble_prueba6.xls')
+    wb = excel.Workbooks.Open(r'C:\Users\josko\PycharmProjects\josko\inmueble_prueba7.xls')
     # excel.Visible = True
     ws_ic = wb.Worksheets('Infos clés')
     ws_pb = wb.Worksheets('PB')
@@ -272,7 +354,7 @@ def get_data():
     project['pbs'] = PBs
     project['btis'] = BTIs
     wb.Close(False)
-    wb = excel.Workbooks.Open(r'C:\Users\josko\PycharmProjects\josko\cablage6.xlsx')
+    wb = excel.Workbooks.Open(r'C:\Users\josko\PycharmProjects\josko\cablage7.xlsx')
     excel.Visible = True
     sheet = wb.Worksheets(1)
     canvas = sheet.Shapes
@@ -332,13 +414,13 @@ def set_up_browser():
 
 
 def login(browser):
-
+    wait = WebDriverWait(browser, 10)
     elem = browser.find_element_by_id("username")
     elem.clear()
     elem.send_keys("WZLM6940")
     elem2 = browser.find_element_by_id("password")
     elem2.clear()
-    elem2.send_keys("Soge2017*")
+    elem2.send_keys("Soge2017;")
     time.sleep(1)
     elem2.send_keys(Keys.RETURN)
     time.sleep(2)
@@ -352,15 +434,15 @@ def login(browser):
     except:
         pass
     time.sleep(10)
+    main_window = browser.current_window_handle
     ipon_link = browser.find_element_by_xpath('/html/body/table[4]/tbody/tr/td[2]/center/table/tbody/tr/td/div[1]/div/table/tbody/tr/td/table/tbody/tr/td/div[1]/table[5]/tbody/tr/td[1]/table/tbody/tr/td[2]/a/b')
     ipon_link.click()
-    time.sleep(4)
-    main_window = browser.window_handles[0]
-    second_window = browser.window_handles[1]
+    wait.until(EC.number_of_windows_to_be(2))
+    second_window = [window for window in browser.window_handles if window != main_window][0]
     browser.switch_to_window(second_window)
     time.sleep(1)
     browser.close()
-    time.sleep(1)
+    wait.until(EC.number_of_windows_to_be(1))
     browser.switch_to_window(main_window)
     time.sleep(1)
     browser.get('https://ipon.sso.francetelecom.fr/NGI/GassiAccess.jsp')
@@ -370,12 +452,14 @@ def login(browser):
     elem2 = browser.find_element_by_id("password")
     elem2.clear()
     time.sleep(2)
-    elem2.send_keys("Soge2017*")
+    elem2.send_keys("Soge2017;")
     time.sleep(1)
     sign_in_button = browser.find_element_by_xpath('/html/body/div/div[1]/div[2]/div[2]/form/span/span/a').click()
     time.sleep(3)
     browser.get('https://ipon.sso.francetelecom.fr/NGI/GassiAccess.jsp')
     time.sleep(4)
+    browser.set_window_position(WX, WY)
+    browser.set_window_size(1700, 1100)
 
 
 def crear_proyecto_ipon(browser, nra, project):
@@ -388,7 +472,8 @@ def crear_proyecto_ipon(browser, nra, project):
     time.sleep(3)
     nom = browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[1]/td[2]/input')
     nom.clear()
-    nom.send_keys(project['nom_project'])
+    nom_project = project['nom_project'] + '_test_josko'
+    nom.send_keys(nom_project)
     code_secteur = browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[5]/td[2]/input')
     code_secteur.clear()
     code_secteur.send_keys(nra)
@@ -407,9 +492,10 @@ def select_imb(browser, imbs, inmueble):
     time.sleep(1)
     id_inmuble_form = browser.find_element_by_xpath(
         '/html/body/div[1]/div[1]/div/form[1]/div/table/tbody/tr[2]/td[1]/table/tbody/tr[1]/td/div[1]/table/tbody/tr/td[3]/font/div/input')
+    id_inmuble_form.clear()
     time.sleep(1)
     id_inmuble_form.send_keys(inmueble)
-    shell.SendKeys("{ENTER}", 0)
+    # shell.SendKeys("{ENTER}", 0)
     time.sleep(1)
     browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form[1]/div/table/tbody/tr[1]/td/table/tbody/tr/td[1]/a').click()
     time.sleep(6)
@@ -418,6 +504,7 @@ def select_imb(browser, imbs, inmueble):
 
 
 def estudio(browser, nra, imbs, inmueble):
+    wait = WebDriverWait(browser, 15)
     # modifier IMB
     browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[1]/tbody/tr/td[2]/a').click()
     time.sleep(3)
@@ -430,16 +517,14 @@ def estudio(browser, nra, imbs, inmueble):
     time.sleep(1)
     browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[12]/td[2]/select/option[3]').click()
     time.sleep(1)
+    main_window = browser.current_window_handle
     # abrimos nueva ventana para seleccionar el NRA
     browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[3]/td[2]/a[1]').click()
-    time.sleep(5)
-    main_window = browser.current_window_handle
-    signin_window_handle = browser.window_handles[1]
+    wait.until(EC.number_of_windows_to_be(2))
+    signin_window_handle = [window for window in browser.window_handles if window != main_window][0]
     browser.switch_to.window(signin_window_handle)
-    time.sleep(3)
-    frame = browser.find_element_by_xpath('/html/frameset/frame[1]')
-    frame2 = browser.find_element_by_xpath('/html/frameset/frame[2]')
-    browser.switch_to_frame(frame)
+    wait.until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '/html/frameset/frame[1]')))
+    # frame2 = browser.find_element_by_xpath('/html/frameset/frame[2]')
     time.sleep(1)
     row_text = browser.find_element_by_xpath("//*[contains(text(), 'NRA " + nra + "')]")
     row_parent = row_text.find_element_by_xpath('../..')
@@ -447,11 +532,11 @@ def estudio(browser, nra, imbs, inmueble):
     clickable_button.click()
     time.sleep(2)
     browser.switch_to_default_content()
-    browser.switch_to_frame(frame2)
+    wait.until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '/html/frameset/frame[2]')))
     time.sleep(1)
     # click selectionner
     browser.find_element_by_xpath('/html/body/form/div[1]/div/a').click()
-    time.sleep(1)
+    wait.until(EC.number_of_windows_to_be(1))
     browser.switch_to_window(main_window)
     time.sleep(1)
     # mettre a jours (save)
@@ -470,12 +555,16 @@ def consulter_metre(browser, imbs, inmueble):
         time.sleep(2)
         browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/form/table/tbody/tr[3]/td/font/div[1]/a').click()
         time.sleep(3)
-        # browser.set_window_position(WX, WY)
-        # browser.set_window_size(1700, 1100)
+        browser.set_window_position(WX, WY)
+        browser.set_window_size(1700, 1100)
         shell.SendKeys("{F12}", 0)
         time.sleep(6)
-        win32_click(2397, 757)
+        win32_click(2397, 1000)
+        # time.sleep(2)
+        # shell.SendKeys("{F12}", 0)
+        # win32_click(2397, 1000)
         time.sleep(2)
+        time.sleep(5)
         type_batiment = browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]'
                                                       '/td/form/table[2]/tbody/tr/td/table[2]/tbody/tr/td/div/table/tbody/tr/td[6]/div')
         elem_but_pos(type_batiment)
@@ -513,7 +602,7 @@ def consulter_metre(browser, imbs, inmueble):
         time.sleep(2)
         browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/form/table/tbody/tr[5]/'
                                       'td/font/div[1]/a').click()
-        time.sleep(3)
+        time.sleep(4)
         # click nouveau niveau
         browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]/td/form/'
                                       'table[2]/tbody/tr/td/table[1]/tbody/tr/td/table/tbody/tr/td[5]/font/a[2]').click()
@@ -566,7 +655,7 @@ def consulter_metre(browser, imbs, inmueble):
                 time.sleep(1)
                 shell.Sendkeys("{DELETE}", 0)
                 time.sleep(1)
-                shell.SendKeys("RCD", 0)
+                shell.SendKeys("RDC", 0)
                 time.sleep(1)
                 shell.SendKeys("{ENTER}", 0)
             i += 1
@@ -642,12 +731,15 @@ def consulter_metre(browser, imbs, inmueble):
         time.sleep(2)
         browser.find_element_by_xpath('/html/body/table[3]/tbody/tr/td[2]/table/tbody/tr/td/table/tbody/tr[1]/td/form/table[2]/tbody/tr/td/table[1]/tbody/tr/td/table/tbody/tr/td[2]/font/a[2]').click()
     time.sleep(3)
+    browser.find_element_by_xpath('/html/body/table[1]/tbody/tr[1]/td[1]/a').click()
+    time.sleep(5)
 
 
-def crear_pb(browser, imbs, inmueble, pbs, btis):
+def crear_pb(browser, imbs, inmueble, pbs, btis, project):
+    wait = WebDriverWait(browser, 15)
     pythoncom.CoInitialize()
     excel = win32com.client.gencache.EnsureDispatch('Excel.Application')
-    wb2 = excel.Workbooks.Open(r'C:\Users\josko\PycharmProjects\josko\cablage6.xlsx')
+    wb2 = excel.Workbooks.Open(r'C:\Users\josko\PycharmProjects\josko\cablage7.xlsx')
     excel.Visible = True
     sheet = wb2.Worksheets(1)
     canvas = sheet.Shapes
@@ -724,11 +816,12 @@ def crear_pb(browser, imbs, inmueble, pbs, btis):
             time.sleep(1)
             select_modele = browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/'
                                                           'td/table/tbody/tr[6]/td[2]/select').click()
-            bti_description = 'PEO BPI NEXANS T3'
             if btis[bti]['tipo'] == 'BTI 36':
+                bti_description = ' BTI 36 FO'
                 selection_modele = browser.find_element_by_xpath(
                     '/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[6]/td[2]/select/option[19]').click()
             if btis[bti]['tipo'] == 'BTI 144':
+                bti_description = ' BTI 144 FO'
                 selection_modele = browser.find_element_by_xpath(
                     '/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[6]/td[2]/select/option[21]').click()
             time.sleep(1)
@@ -775,7 +868,6 @@ def crear_pb(browser, imbs, inmueble, pbs, btis):
             # Cambiar la descripción del PB
             description_area = browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/'
                                                              'td/table[2]/tbody/tr[2]/td[2]/textarea')
-            description_area.clear()
             description_area.send_keys(bti_description)
             # Hauteur par rapport au sol
             browser.find_element_by_xpath(
@@ -801,8 +893,8 @@ def crear_pb(browser, imbs, inmueble, pbs, btis):
             time.sleep(2)
             browser.find_element_by_xpath('/html/body/div/div[1]/table/tbody/tr[3]/td/div/div/a[7]').click()
             time.sleep(2)
-    # # TODO guardar el plan decablage despues de sacar los PTs pillar la chambre antes del excel sacar principio o aqui
-    wb2.Close(False)
+    # # # TODO guardar el plan decablage despues de sacar los PTs pillar la chambre antes del excel sacar principio o aqui
+    wb2.Close(True)
     for pb in pbs:
         if pbs[pb]['inmueble'] == inmueble:
             # TODO CH 01573 de ejemplo luego se pillará de un excel
@@ -814,9 +906,14 @@ def crear_pb(browser, imbs, inmueble, pbs, btis):
             time.sleep(2)
             input_chambre = browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form[1]/div/table/tbody/tr[2]/'
                                                           'td[1]/table/tbody/tr[3]/td/div/table/tbody/tr/td[3]/font/span/input')
-            chambre_code = '01573'
-            pt_code = 'PT 1394'
+            input_nom_chambre = browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form[1]/div/table/tbody/tr['
+                                                              '2]/td[1]/table/tbody/tr[1]/td/div[1]/table/tbody/tr/td'
+                                                              '[3]/font/div/input')
+            chambre_code = project['pa_chambre']
+            pt_code = project['pa_pt']
             time.sleep(1)
+            input_nom_chambre.clear()
+            input_chambre.clear()
             input_chambre.send_keys(chambre_code)
             time.sleep(1)
             browser.find_element_by_id('searchButton').click()
@@ -837,13 +934,13 @@ def crear_pb(browser, imbs, inmueble, pbs, btis):
             main_window = browser.current_window_handle
             mas1 = browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table[1]/tbody/tr/td/table/thead/t'
                                                  'r[4]/td[2]/b[1]/a').click()
-            time.sleep(4)
-            signin_window_handle = browser.window_handles[1]
-            time.sleep(1)
+            wait.until(EC.number_of_windows_to_be(2))
+            signin_window_handle = [window for window in browser.window_handles if window != main_window][0]
             browser.switch_to.window(signin_window_handle)
-            frame1 = browser.find_element_by_xpath('/html/frameset/frame[1]')
-            frame2 = browser.find_element_by_xpath('/html/frameset/frame[2]')
-            browser.switch_to_frame(frame1)
+            wait.until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '/html/frameset/frame[1]')))
+            # frame1 = browser.find_element_by_xpath('/html/frameset/frame[1]')
+            # frame2 = browser.find_element_by_xpath('/html/frameset/frame[2]')
+
             # Seleccionar inmueble
             browser.find_element_by_xpath('/html/body/div[1]/div/table/tbody/tr[1]/td/table/tbody/tr/td[3]/div/ul/li/div/form/input[1]').click()
             time.sleep(1)
@@ -853,6 +950,7 @@ def crear_pb(browser, imbs, inmueble, pbs, btis):
             id_inmuble_form = browser.find_element_by_xpath(
                 '/html/body/div[1]/div/div/form[1]/div/table/tbody/tr[2]/td[1]/table/tbody/tr[1]/td/div[1]/table/tbody/tr/td[3]/font/div/input')
             time.sleep(1)
+            id_inmuble_form.clear()
             id_inmuble_form.send_keys(inmueble)
             time.sleep(1)
             browser.find_element_by_id('searchButton').click()
@@ -861,23 +959,23 @@ def crear_pb(browser, imbs, inmueble, pbs, btis):
                 '/html/body/div[1]/div/div/form[2]/table/tbody/tr/td/div[1]/table/tbody/tr/td[1]/input').click()
             time.sleep(1)
             browser.switch_to_default_content()
-            time.sleep(1)
-            browser.switch_to_frame(frame2)
+            wait.until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '/html/frameset/frame[2]')))
             time.sleep(1)
             browser.find_element_by_xpath('/html/body/form/div[1]/div/a').click()
-            time.sleep(2)
+            wait.until(EC.number_of_windows_to_be(1))
             browser.switch_to_window(main_window)
             time.sleep(1)
-            main_window = browser.current_window_handle
+            # main_window = browser.current_window_handle
             mas2 = browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table[1]/tbody/tr/td/table/thead/tr'
                                                  '[5]/td[2]/b[1]/a').click()
-            time.sleep(4)
-            signin_window_handle = browser.window_handles[1]
+            wait.until(EC.number_of_windows_to_be(2))
+            signin_window_handle = [window for window in browser.window_handles if window != main_window][0]
             browser.switch_to.window(signin_window_handle)
             time.sleep(1)
             frame1 = browser.find_element_by_xpath('/html/frameset/frame[1]')
             frame2 = browser.find_element_by_xpath('/html/frameset/frame[2]')
             browser.switch_to_frame(frame1)
+
             i = 2
             for k in range(1):
                 browser.find_element_by_xpath('/html/body/div/div/div/form/table/tbody/tr[2]/td/table/tbody/tr[' + str(i) + ']/td[1]/input').click()
@@ -895,9 +993,12 @@ def crear_pb(browser, imbs, inmueble, pbs, btis):
 
 
 def crear_cables(browser, imbs, inmueble, pbs, btis, cables, pa_chambre):
+    wait = WebDriverWait(browser, 15)
     browser.find_element_by_xpath('/html/body/div[1]/div[1]/table/tbody/tr[3]/td/table/tbody/tr/td/div[2]/table/tbody/tr/td[2]/a').click()
     time.sleep(2)
-
+    # TODO eliminar inicialización de pts de pbs en produccion
+    pbs['a']['pt'] = '005430'
+    pbs['b']['pt'] = '005433'
     for cable in cables:
         if 'bti' in cables[cable]['ini']:  # si el cable va de bti a pb es interno
             time.sleep(3)
@@ -910,8 +1011,267 @@ def crear_cables(browser, imbs, inmueble, pbs, btis, cables, pa_chambre):
             num_fo_form.send_keys(cables[cable]['num_fo'])
             time.sleep(1)
             # Pulsar el + para añadir site suport que conecta los cables
+            main_window = browser.current_window_handle
             browser.find_element_by_xpath(
                 '/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[8]/td[2]/a[1]').click()
+            # Espera a que haya 2 ventanas y luego cambia a la nueva
+            wait.until(EC.number_of_windows_to_be(2))
+            signin_window_handle = [window for window in browser.window_handles if window != main_window][0]
+            browser.switch_to.window(signin_window_handle)
+            time.sleep(3)
+            frame = browser.find_element_by_xpath('/html/frameset/frame[1]')
+            frame2 = browser.find_element_by_xpath('/html/frameset/frame[2]')
+            browser.switch_to_frame(frame)
+
+            time.sleep(2)
+            # #TODO quitar los pts de los pbs y btis por defecto
+            for bti in btis:
+                ini = cables[cable]['ini']
+                if ini[-1] == bti:
+                    if btis[bti]['imb_is'] == inmueble:
+                        #TODO eliminar esta linea cuando se guarde bien
+                        btis[bti]['pt'] = '005434'
+                        select_pt_in_imb(browser, frame2, btis[bti]['pt'])
+
+            wait.until(EC.number_of_windows_to_be(1))
+            browser.switch_to_window(main_window)
+            time.sleep(1)
+            browser.find_element_by_xpath(
+                '/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[8]/td[2]/a[1]').click()
+            wait.until(EC.number_of_windows_to_be(2))
+            signin_window_handle = [window for window in browser.window_handles if window != main_window][0]
+            browser.switch_to.window(signin_window_handle)
+            time.sleep(3)
+            frame = browser.find_element_by_xpath('/html/frameset/frame[1]')
+            frame2 = browser.find_element_by_xpath('/html/frameset/frame[2]')
+            browser.switch_to_frame(frame)
+
+            time.sleep(2)
+            # TODO quitar los pts de los pbs y btis por defecto y poner que elija el de más arriba
+            for pb in pbs:
+                if cables[cable]['fin'] == pb:
+                    if pbs[pb]['inmueble'] == inmueble:
+                        select_pt_in_imb(browser, frame2, pbs[pb]['pt'])
+
+            wait.until(EC.number_of_windows_to_be(1))
+            browser.switch_to_window(main_window)
+            time.sleep(2)
+            # Crear cable
+            browser.find_element_by_xpath(
+                '/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[15]/td/a[1]').click()
+            # Pulsar el cable
+            # browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/div[1]/table/tbody/tr/td[2]/a').click()
+            time.sleep(3)
+            select_in_out_cable(browser)
+            # Click en parametros para OSP inventaire
+            browser.find_element_by_xpath(
+                '/html/body/div[1]/div[1]/table/tbody/tr[3]/td/table/tbody/tr/td/div[4]/table/tbody/tr/td[2]/a').click()
+            time.sleep(3)
+            tr_number = browser.find_element_by_xpath('/html/body/div/div[1]/table/tbody/tr[3]/td/div/div/a[9]').text
+            # Pulsar en modifier
+            browser.find_element_by_xpath(
+                '/html/body/div/div[1]/div/div[3]/form/table/tbody/tr/td/table[1]/tbody/tr/td[2]/a').click()
+            time.sleep(3)
+            browser.find_element_by_xpath(
+                '/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[24]/td[2]/select').click()
+            browser.find_element_by_xpath(
+                '/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[24]/td[2]/select/option[5]').click()
+            time.sleep(1)
+            longeur_form = browser.find_element_by_xpath(
+                '/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[26]/td[2]/input')
+            longeur_form.send_keys(cables[cable]['metros'])
+            time.sleep(1)
+            # Pulsa en mettre a jour para guardar los cambios
+            browser.find_element_by_xpath(
+                '/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[1]/tbody/tr/td[2]/a').click()
+
+            time.sleep(2)
+
+            pythoncom.CoInitialize()
+            excel = win32com.client.gencache.EnsureDispatch('Excel.Application')
+            wb = excel.Workbooks.Open(r'C:\Users\josko\PycharmProjects\josko\cablage7.xlsx')
+            excel.Visible = True
+            sheet = wb.Worksheets(1)
+            canvas = sheet.Shapes
+            time.sleep(8)
+            cables[cable]['nombre'] = tr_number
+            for shp in canvas:
+                box = shp.TextFrame2.TextRange.Characters.Text
+                if 'TR' in box:
+                    str_to_replace = 'TR ' + cables[cable]['ini'] + '-' + cables[cable]['fin']
+                    box = box.replace(str_to_replace, tr_number)
+                    shp.TextFrame2.TextRange.Characters.Text = box
+            time.sleep(1)
+            wb.Close(False)
+            excel.Application.Quit()
+            time.sleep(2)
+            # Vuelve al cable para crear el point de piquage
+            browser.find_element_by_xpath('//html/body/div/div[1]/table/tbody/tr[3]/td/table/tbody/tr/td/div[1]/table/tbody/tr/td[2]/a').click()
+            time.sleep(2)
+            pb_fin_cable = cables[cable]['fin']
+            # Recorrer los pbs que estan en el mismo batiment
+            for pb in pbs:
+                if pbs[pb_fin_cable]['colonne'] == pbs[pb]['colonne'] and pb != pb_fin_cable:
+                    # Selecciona la bti y pulsa en creer point de piquage
+                    main_window = browser.current_window_handle
+                    browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[1]/td[1]/input').click()
+                    browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/table/tbody/tr/td[4]/a').click()
+                    # Capturar la ventana emergente
+                    wait.until(EC.number_of_windows_to_be(2))
+                    signin_window_handle = [window for window in browser.window_handles if window != main_window][0]
+                    browser.switch_to.window(signin_window_handle)
+                    time.sleep(3)
+                    frame = browser.find_element_by_xpath('/html/frameset/frame[1]')
+                    frame2 = browser.find_element_by_xpath('/html/frameset/frame[2]')
+                    browser.switch_to_frame(frame)
+
+                    select_pt_in_imb(browser, frame2, pbs[pb]['pt'])
+                    wait.until(EC.number_of_windows_to_be(1))
+                    browser.switch_to_window(main_window)
+                    browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[10]/td[2]/a[1]').click()
+                    wait.until(EC.number_of_windows_to_be(2))
+                    signin_window_handle = [window for window in browser.window_handles if window != main_window][0]
+                    browser.switch_to.window(signin_window_handle)
+                    time.sleep(3)
+                    frame = browser.find_element_by_xpath('/html/frameset/frame[1]')
+                    frame2 = browser.find_element_by_xpath('/html/frameset/frame[2]')
+                    browser.switch_to_frame(frame)
+                    time.sleep(2)
+                    i = 1
+                    while True:
+                        b = browser.find_element_by_xpath(
+                            '/html/body/div/div/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[' + str(i) + ']/td[3]').text
+                        if b == '' and browser.find_element_by_xpath(
+                                                '/html/body/div/div/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[' + str(
+                                            i) + ']/td[4]').text == 'Entrée':
+                            browser.find_element_by_xpath(
+                                '/html/body/div/div/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[' + str(
+                                    i) + ']/td[1]').click()
+                            break
+                        i += 1
+                    time.sleep(3)
+                    browser.switch_to_default_content()
+                    time.sleep(1)
+                    browser.switch_to_frame(frame2)
+                    time.sleep(1)
+                    browser.find_element_by_xpath('/html/body/form/div[1]/div/a').click()
+                    wait.until(EC.number_of_windows_to_be(1))
+                    browser.switch_to_window(main_window)
+                    time.sleep(2)
+                    browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/div[3]/form/table/tbody/tr/td/table[1]/tbody/tr/td[2]/a').click()
+                    time.sleep(1)
+                    browser.find_element_by_xpath('/html/body/div/div[1]/div/div[3]/form/table/tbody/tr/td/table[2]/tbody/tr[12]/td[2]/a').click()
+
+            # Crear conexiones
+            # Pulsar el cable  TODO eliminar esta linea en produccion
+            # browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/div[1]/table/tbody/tr/td[2]/a').click()
+            # Pulsar en el pt de la bti
+            browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[1]/td[4]/a').click()
+            time.sleep(2)
+            # Pulsar en points de conexion
+            browser.find_element_by_xpath('/html/body/div[1]/div[1]/table/tbody/tr[3]/td/table/tbody/tr/td/div[1]/table/tbody/tr/td[2]/a').click()
+            time.sleep(2)
+            main_window = browser.current_window_handle
+            # Seleccionar todas las Eppissure y pulsar en fibras de salida
+            browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table/tbody/tr/td/div[1]/table/thead/tr/th[1]/span/a').click()
+            browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table/tbody/tr/td/div[1]/table/thead/tr/th[7]/table/tbody/tr/td[3]/a').click()
+            # TODO Hay que seleccionar el cable creado el tr_number eliminar esta linea en produccion
+            tr_number = '17 0233'
+            wait.until(EC.number_of_windows_to_be(2))
+            signin_window_handle = [window for window in browser.window_handles if window != main_window][0]
+            browser.switch_to.window(signin_window_handle)
+            time.sleep(3)
+            frame = browser.find_element_by_xpath('/html/frameset/frame[1]')
+            frame2 = browser.find_element_by_xpath('/html/frameset/frame[2]')
+            browser.switch_to_frame(frame)
+
+            time.sleep(2)
+            # Pulsar en el Cable TR
+            browser.find_element_by_xpath('/html/body/div/div/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[3]/td[3]/a').click()
+            # browser.find_element_by_xpath("//*[contains(text(), '" + tr_number + "')]").click()
+            # Seleccionar todas las fibras
+            browser.find_element_by_xpath('/html/body/div/div/div/form[2]/table/tbody/tr/td/div[1]/table/thead/tr/th[1]/span/a').click()
+            browser.switch_to_default_content()
+            time.sleep(1)
+            browser.switch_to_frame(frame2)
+            time.sleep(1)
+            browser.find_element_by_xpath('/html/body/form/div[1]/div/a').click()
+            wait.until(EC.number_of_windows_to_be(1))
+            browser.switch_to_window(main_window)
+            time.sleep(3)
+            def volver_a_cable():
+                browser.find_element_by_xpath('/html/body/div[1]/div[1]/table/tbody/tr[3]/td/div/div/a[7]').click()
+                time.sleep(1)
+                browser.find_element_by_xpath('/html/body/div[1]/div[1]/table/tbody/tr[3]/td/table/tbody/tr/td/div[2]/table/tbody/tr/td[2]/a').click()
+                time.sleep(1)
+                browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/div[1]/table/tbody/tr/td[2]/a').click()
+                time.sleep(1)
+            volver_a_cable()
+            num_pbs_en_cm = 1
+            for pb in pbs:
+                if pbs[pb_fin_cable]['colonne'] == pbs[pb]['colonne'] and pb != pb_fin_cable:
+                    num_pbs_en_cm += 1
+            numero_de_fibra_de_entrada = 1
+            for i in range(3, num_pbs_en_cm * 2 + 2, 2):
+                time.sleep(2)
+                browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[' + str(i) + ']/td[4]/a').click()
+                time.sleep(3)
+                pt_actual = browser.find_element_by_xpath('/html/body/div[1]/div[1]/table/tbody/tr[3]/td/div/div/a[8]').text
+                pt_actual = pt_actual[3:]
+                browser.find_element_by_xpath('/html/body/div[1]/div[1]/table/tbody/tr[3]/td/table/tbody/tr/td/div[1]/table/tbody/tr/td[2]/a').click()
+                time.sleep(1)
+                for pb in pbs:
+                    if pbs[pb]['pt'] == pt_actual:
+                        num_fib_necesarias = 6
+                        while pbs[pb]['num_el'] > num_fib_necesarias:
+                            num_fib_necesarias += 6
+                        for i in range(1, num_fib_necesarias + 1):
+                            browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[' + str(i) + ']/td[1]/input').click()
+                        main_window = browser.current_window_handle
+                        browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table/tbody/tr/td/div[1]/table/thead/tr/th[6]/table/tbody/tr/td[3]/a').click()
+                        wait.until(EC.number_of_windows_to_be(2))
+                        signin_window_handle = [window for window in browser.window_handles if window != main_window][0]
+                        browser.switch_to.window(signin_window_handle)
+                        time.sleep(3)
+                        frame = browser.find_element_by_xpath('/html/frameset/frame[1]')
+                        frame2 = browser.find_element_by_xpath('/html/frameset/frame[2]')
+                        browser.switch_to_frame(frame)
+                        time.sleep(2)
+                        browser.find_element_by_xpath('/html/body/div/div/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[1]/td[3]/a').click()
+                        time.sleep(1)
+                        browser.find_element_by_xpath('/html/body/div/div/table/tbody/tr[3]/td/table/tbody/tr/td/div[1]/table/tbody/tr/td[2]/a').click()
+                        # Pulsa en las fibras que tienen que entrar en el pb
+                        for i in range(numero_de_fibra_de_entrada, numero_de_fibra_de_entrada + num_fib_necesarias):
+                            browser.find_element_by_xpath('/html/body/div/div/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[' + str(i) + ']/td[1]/input').click()
+                        numero_de_fibra_de_entrada += num_fib_necesarias
+                        time.sleep(2)
+                        browser.switch_to_default_content()
+                        time.sleep(1)
+                        browser.switch_to_frame(frame2)
+                        time.sleep(1)
+                        browser.find_element_by_xpath('/html/body/form/div[1]/div/a').click()
+                        wait.until(EC.number_of_windows_to_be(1))
+                        browser.switch_to_window(main_window)
+                        time.sleep(1)
+                        volver_a_cable()
+            # Volver a cables
+            browser.find_element_by_xpath('/html/body/div/div[1]/table/tbody/tr[3]/td/div/div/a[8]').click()
+
+    for cable in cables:
+        # Click en la comuna ej. "picardie"
+        browser.find_element_by_xpath('/html/body/div[1]/div[1]/table/tbody/tr[3]/td/div/div/a[4]').click()
+        time.sleep(2)
+        browser.find_element_by_xpath('/html/body/div[1]/div[1]/table/tbody/tr[3]/td/table/tbody/tr/td/div[2]/table/tbody/tr/td[2]/a').click()
+        if cables[cable]['ini'] == 'PA':  # si el cable es externo
+            time.sleep(1)
+            browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/table/tbody/tr/td[4]/a').click()
+            time.sleep(1)
+            num_fo_form = browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[3]/td[2]/input')
+            num_fo_form.clear()
+            num_fo_form.send_keys(cables[cable]['num_fo'])
+            time.sleep(1)
+            # Pulsar el + para añadir site suport que conecta los cables
+            browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[8]/td[2]/a[1]').click()
             time.sleep(4)
             main_window = browser.current_window_handle
             time.sleep(2)
@@ -922,19 +1282,7 @@ def crear_cables(browser, imbs, inmueble, pbs, btis, cables, pa_chambre):
             frame2 = browser.find_element_by_xpath('/html/frameset/frame[2]')
             browser.switch_to_frame(frame)
             time.sleep(2)
-            #TODO quitar los pts de los pbs y btis por defecto
-            for pb in pbs:
-                if cables[cable]['ini'] == pb:
-                    if pbs[pb]['inmueble'] == inmueble:
-                        pbs[pb]['pt'] = '002586'
-                        select_pt_in_imb(browser, frame2, pbs[pb]['pt'])
-            for bti in btis:
-                ini = cables[cable]['ini']
-                if ini[-1] == bti:
-                    if btis[bti]['inmueble'] == inmueble:
-                        btis[bti]['pt'] = '002586'
-                        select_pt_in_imb(browser, frame2, btis[bti]['pt'])
-
+            select_pa(browser, pa_chambre, inmueble, frame2)
             browser.switch_to_window(main_window)
             time.sleep(1)
             browser.find_element_by_xpath(
@@ -949,155 +1297,25 @@ def crear_cables(browser, imbs, inmueble, pbs, btis, cables, pa_chambre):
             frame2 = browser.find_element_by_xpath('/html/frameset/frame[2]')
             browser.switch_to_frame(frame)
             time.sleep(2)
-            # TODO quitar los pts de los pbs y btis por defecto
             for pb in pbs:
                 if cables[cable]['fin'] == pb:
                     if pbs[pb]['inmueble'] == inmueble:
-                        pbs[pb]['pt'] = '002586'
-                        select_pt_in_imb(browser, frame2, pbs[pb]['pt'])
-
+                        select_imb_con_pt(browser, inmueble, frame2)
+            for bti in btis:
+                fin = cables[cable]['fin']
+                if fin[-1] == bti:
+                    if btis[bti]['imb_is'] == inmueble:
+                        select_imb_con_pt(browser, inmueble, frame2)
             browser.switch_to_window(main_window)
             time.sleep(2)
             # Crear cable
-            browser.find_element_by_xpath(
-                '/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[15]/td/a[1]').click()
-
-    for cable in cables:
-        # Click en la comuna ej. "picardie"
-        browser.find_element_by_xpath('/html/body/div[1]/div[1]/table/tbody/tr[3]/td/div/div/a[4]').click()
-        time.sleep(2)
-        browser.find_element_by_xpath('/html/body/div[1]/div[1]/table/tbody/tr[3]/td/table/tbody/tr/td/div[2]/table/tbody/tr/td[2]/a').click()
-        # if cables[cable]['ini'] == 'PA':  # si el cable es externo
-        #     time.sleep(1)
-        #     browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/table/tbody/tr/td[4]/a').click()
-        #     time.sleep(1)
-        #     num_fo_form = browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[3]/td[2]/input')
-        #     num_fo_form.clear()
-        #     num_fo_form.send_keys(cables[cable]['num_fo'])
-        #     time.sleep(1)
-        #     # Pulsar el + para añadir site suport que conecta los cables
-        #     browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[8]/td[2]/a[1]').click()
-        #     time.sleep(4)
-        #     main_window = browser.current_window_handle
-        #     time.sleep(2)
-        #     signin_window_handle = browser.window_handles[1]
-        #     browser.switch_to.window(signin_window_handle)
-        #     time.sleep(3)
-        #     frame = browser.find_element_by_xpath('/html/frameset/frame[1]')
-        #     frame2 = browser.find_element_by_xpath('/html/frameset/frame[2]')
-        #     browser.switch_to_frame(frame)
-        #     time.sleep(2)
-        #     select_pa(browser, pa_chambre, inmueble, frame2)
-        #     browser.switch_to_window(main_window)
-        #     time.sleep(1)
-        #     browser.find_element_by_xpath(
-        #         '/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[8]/td[2]/a[1]').click()
-        #     time.sleep(4)
-        #     main_window = browser.current_window_handle
-        #     time.sleep(2)
-        #     signin_window_handle = browser.window_handles[1]
-        #     browser.switch_to.window(signin_window_handle)
-        #     time.sleep(3)
-        #     frame = browser.find_element_by_xpath('/html/frameset/frame[1]')
-        #     frame2 = browser.find_element_by_xpath('/html/frameset/frame[2]')
-        #     browser.switch_to_frame(frame)
-        #     time.sleep(2)
-        #     for pb in pbs:
-        #         if cables[cable]['fin'] == pb:
-        #             if pbs[pb]['inmueble'] == inmueble:
-        #                 select_imb_con_pt(browser, inmueble, frame2)
-        #     for bti in btis:
-        #         fin = cables[cable]['fin']
-        #         if fin[-1] == bti:
-        #             if btis[bti]['imb_is'] == inmueble:
-        #                 select_imb_con_pt(browser, inmueble, frame2)
-        #     browser.switch_to_window(main_window)
-        #     time.sleep(2)
-        #     # Crear cable
-        #     browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[15]/td/a[1]').click()
+            browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[15]/td/a[1]').click()
 
         time.sleep(2)
         # Pulsar el cable
-        browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/div[1]/table/tbody/tr/td[2]/a').click()
-        time.sleep(3)
-        # browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[1]/td[1]/input').click()
-        # time.sleep(1)
-        # browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/div[1]/table/thead/tr/th[3]/table/tbody/tr/td[3]/a').click()
-        # time.sleep(4)
-        # main_window = browser.current_window_handle
-        # time.sleep(2)
-        # signin_window_handle = browser.window_handles[1]
-        # browser.switch_to.window(signin_window_handle)
+        # browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/div[1]/table/tbody/tr/td[2]/a').click()
         # time.sleep(3)
-        # frame = browser.find_element_by_xpath('/html/frameset/frame[1]')
-        # frame2 = browser.find_element_by_xpath('/html/frameset/frame[2]')
-        # browser.switch_to_frame(frame)
-        # time.sleep(2)
-        # browser.find_element_by_xpath('/html/body/div[1]/div/div/form/table/tbody/tr/td/div[1]/table/tbody/tr/td[2]/a').click()
-        # time.sleep(3)
-        # browser.find_element_by_xpath('/html/body/div[1]/div/table/tbody/tr[3]/td/table/tbody/tr/td/div[2]/table/tbody/tr/td[2]/a').click()
-        # time.sleep(2)
-        # i = 1
-        # while True:
-        #     b = browser.find_element_by_xpath(
-        #         '/html/body/div/div/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[' + str(i) + ']/td[3]').text
-        #     if b == '' and browser.find_element_by_xpath(
-        #                             '/html/body/div/div/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[' + str(
-        #                             i) + ']/td[4]').text == 'Sortie':
-        #         browser.find_element_by_xpath(
-        #             '/html/body/div/div/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[' + str(i) + ']/td[1]').click()
-        #         break
-        #     i += 1
-        # time.sleep(2)
-        # browser.switch_to_default_content()
-        # time.sleep(1)
-        # browser.switch_to_frame(frame2)
-        # time.sleep(1)
-        # browser.find_element_by_xpath('/html/body/form/div[1]/div/a').click()
-        # time.sleep(1)
-        # browser.switch_to_window(main_window)
-        # time.sleep(3)
-        # browser.find_element_by_xpath(
-        #     '/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[3]/td[1]/input').click()
-        # time.sleep(1)
-        # browser.find_element_by_xpath(
-        #     '/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/div[1]/table/thead/tr/th[3]/table/tbody/tr/td[3]/a').click()
-        # time.sleep(4)
-        # main_window = browser.current_window_handle
-        # time.sleep(2)
-        # signin_window_handle = browser.window_handles[1]
-        # browser.switch_to.window(signin_window_handle)
-        # time.sleep(3)
-        # frame = browser.find_element_by_xpath('/html/frameset/frame[1]')
-        # frame2 = browser.find_element_by_xpath('/html/frameset/frame[2]')
-        # browser.switch_to_frame(frame)
-        # time.sleep(2)
-        # browser.find_element_by_xpath(
-        #     '/html/body/div[1]/div/div/form/table/tbody/tr/td/div[1]/table/tbody/tr/td[2]/a').click()
-        # time.sleep(3)
-        # browser.find_element_by_xpath(
-        #     '/html/body/div[1]/div/table/tbody/tr[3]/td/table/tbody/tr/td/div[2]/table/tbody/tr/td[2]/a').click()
-        # time.sleep(2)
-        # i = 1
-        # while True:
-        #     b = browser.find_element_by_xpath(
-        #         '/html/body/div/div/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[' + str(i) + ']/td[3]').text
-        #     if b == '' and browser.find_element_by_xpath(
-        #                             '/html/body/div/div/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[' + str(
-        #                         i) + ']/td[4]').text == 'Entrée':
-        #         browser.find_element_by_xpath(
-        #             '/html/body/div/div/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[' + str(i) + ']/td[1]').click()
-        #         break
-        #     i += 1
-        # time.sleep(2)
-        # browser.switch_to_default_content()
-        # time.sleep(1)
-        # browser.switch_to_frame(frame2)
-        # time.sleep(1)
-        # browser.find_element_by_xpath('/html/body/form/div[1]/div/a').click()
-        # time.sleep(1)
-        # browser.switch_to_window(main_window)
-        # time.sleep(3)
+        select_in_out_cable(browser)
 
         # Click en parametros para OSP inventaire
         browser.find_element_by_xpath('/html/body/div[1]/div[1]/table/tbody/tr[3]/td/table/tbody/tr/td/div[4]/table/tbody/tr/td[2]/a').click()
@@ -1116,7 +1334,7 @@ def crear_cables(browser, imbs, inmueble, pbs, btis, cables, pa_chambre):
         tr_number = browser.find_element_by_xpath('/html/body/div[1]/div[1]/table/tbody/tr[3]/td/div/div/a[6]').text
         pythoncom.CoInitialize()
         excel = win32com.client.gencache.EnsureDispatch('Excel.Application')
-        wb = excel.Workbooks.Open(r'C:\Users\josko\PycharmProjects\josko\cablage6.xlsx')
+        wb = excel.Workbooks.Open(r'C:\Users\josko\PycharmProjects\josko\cablage7.xlsx')
         excel.Visible = True
         sheet = wb.Worksheets(1)
         canvas = sheet.Shapes
@@ -1125,7 +1343,8 @@ def crear_cables(browser, imbs, inmueble, pbs, btis, cables, pa_chambre):
         for shp in canvas:
             box = shp.TextFrame2.TextRange.Characters.Text
             if 'TR' in box:
-                box = box.replace('TR PA-a', tr_number)
+                str_to_replace = 'TR ' + cables[cable]['ini'] + '-' + cables[cable]['fin']
+                box = box.replace(str_to_replace, tr_number)
                 shp.TextFrame2.TextRange.Characters.Text = box
         time.sleep(1)
         # wb.Close(True)
@@ -1160,12 +1379,14 @@ def ejecutar_ipon(nra):
     pa_pt = project['pa_pt']
     browser = set_up_browser()
     login(browser)
-    crear_proyecto_ipon(browser, nra, project)
+    # crear_proyecto_ipon(browser, nra, project)
     for inmueble in imbs.keys():
+        # select_imb(browser, imbs, inmueble)
+        # estudio(browser, nra, imbs, inmueble)
+        # consulter_metre(browser, imbs, inmueble)
         select_imb(browser, imbs, inmueble)
-        estudio(browser, nra, imbs, inmueble)
-        consulter_metre(browser, imbs, inmueble)
-        crear_pb(browser, imbs, inmueble, pbs, btis)
+        crear_pb(browser, imbs, inmueble, pbs, btis, project)
+        select_imb(browser, imbs, inmueble)
         crear_cables(browser, imbs, inmueble, pbs, btis, cables, pa_chambre)
 
 
