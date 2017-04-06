@@ -264,7 +264,7 @@ def boutique_operations(browser, d):
     dos_type = d['tipo']
     browser.get('https://espaceclient.orange-business.com/group/divop/boutique-operateurs')
     time.sleep(3)
-    main_window_handle = browser.current_window_handle
+    main_window = browser.current_window_handle
 
     browser.switch_to_frame(browser.find_element_by_id('ece_iframe'))
     a = browser.find_element_by_css_selector('.sfci_box > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(1) > '
@@ -301,22 +301,20 @@ def boutique_operations(browser, d):
     #         if handle != main_window_handle:
     #             signin_window_handle = handle
     #             break
-    time.sleep(5)
-    signin_window_handle = browser.window_handles[1]
+    WebDriverWait(browser, 15).until(EC.number_of_windows_to_be(2))
+    signin_window_handle = [window for window in browser.window_handles if window != main_window][0]
     browser.switch_to.window(signin_window_handle)
     formulario = d['formulario']
     time.sleep(5)
-
-    row_text = browser.find_element_by_xpath("//*[contains(text(), '" + formulario + "')]")
+    row_text = WebDriverWait(browser, 20).until(
+        EC.element_to_be_clickable((By.XPATH, "//*[contains(text(), '" + formulario + "')]")))
     row_parent = row_text.find_element_by_xpath('..')
     clickable_button = row_parent.find_element_by_xpath('.//input')
     clickable_button.click()
-
-    time.sleep(2)
-    valider_button = browser.find_element_by_css_selector('a.sfci_blackb:nth-child(2)')  # click on button valider
+    valider_button = WebDriverWait(browser, 20).until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'a.sfci_blackb:nth-child(2)')))
     valider_button.click()
-    time.sleep(2)
-    browser.switch_to.window(main_window_handle)
+    WebDriverWait(browser, 15).until(EC.number_of_windows_to_be(1))
+    browser.switch_to.window(main_window)
     time.sleep(1)
 
     # Volvemos a la pagina anterior y aparece un formulario en el que hay que rellenar algunos campos
@@ -802,7 +800,7 @@ def mover_zip_descargado(fci, client):
     origen = None
     print('Moviendo el zip')
     ruta = os.getcwd() + os.sep
-    for i in range(5):
+    for i in range(10):
         for e in os.listdir(ruta):
             if fci in e:
                 origen = ruta + e
