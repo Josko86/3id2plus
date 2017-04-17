@@ -584,14 +584,14 @@ def tsp_operations_2(dosier, ws):
     ws.Cells(dosier['row'], 50).Value = 'DÉPOSÉ'
     ws.Cells(dosier['row'], 51).Value = 'v1'
     ws.Cells(dosier['row'], 52).Value = 'Déposée  en cours'
-    today = datetime.today().strftime("%d-%m-%y")
+    today = datetime.today().strftime("%m-%d-%y")
     ws.Cells(dosier['row'], 53).Value = today
 
 
 def tsp_operations_3(row, ws, v):
     # Operaciones después de hacer el segundo depósito
     ws.Cells(row, 66).Value = 'DÉPOSÉ'
-    today = datetime.today().strftime("%d-%m-%y")
+    today = datetime.today().strftime("%m-%d-%y")
     ws.Cells(row, 67).Value = today
     ws.Cells(row, 68).Value = 'v' + v
     ws.Cells(row, 69).Value = 'Déposée  en cours'
