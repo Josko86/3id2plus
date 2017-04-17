@@ -308,6 +308,7 @@ def boutique_operations(browser, d):
     time.sleep(5)
     row_text = WebDriverWait(browser, 20).until(
         EC.element_to_be_clickable((By.XPATH, "//*[contains(text(), '" + formulario + "')]")))
+    time.sleep(3)
     row_parent = row_text.find_element_by_xpath('..')
     clickable_button = row_parent.find_element_by_xpath('.//input')
     clickable_button.click()
@@ -788,9 +789,10 @@ def descargar_zip_tfx(d, fci, browser, client):
     WebDriverWait(browser, 10).until(EC.frame_to_be_available_and_switch_to_it((By.ID, 'ece_iframe')))
     WebDriverWait(browser, 10).until\
         (EC.presence_of_element_located((By.XPATH, '/html/body/div/div[3]/div[2]/table/tbody/tr[1]/th[7]/input')))
+    time.sleep(3)
     fci_form = browser.find_element_by_xpath('/html/body/div/div[3]/div[2]/table/tbody/tr[1]/th[7]/input')
     fci_form.send_keys('%' + fci)
-    time.sleep(2)
+    time.sleep(4)
     WebDriverWait(browser, 25).until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(), '_" + fci + "')]")))
     browser.find_element_by_xpath('/html/body/div/div[3]/div[2]/table/tbody/tr[2]/td[1]/button').click()
     time.sleep(8)
@@ -802,13 +804,13 @@ def mover_zip_descargado(fci, client):
     ruta = os.getcwd() + os.sep
     for i in range(10):
         for e in os.listdir(ruta):
-            if fci in e:
+            if fci in e and '.part' not in e:
                 origen = ruta + e
                 break
         if origen != None:
             break
         else:
-            time.sleep(2)
+            time.sleep(3)
     destino = 'Z:\\03-PRODUCCION\\0.CAFT\\' + client + '\\PRODUCCIÓN\\PROD_Interna\\11- GCB1_TFX\\ENVIAR' + os.sep
     if os.path.exists(origen):
         ruta = shutil.move(origen, destino)

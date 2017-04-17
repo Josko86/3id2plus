@@ -109,7 +109,7 @@ def select_pt_in_imb(browser, frame2, pt, cable_interno = True):
     time.sleep(1)
 
 
-def select_in_out_cable(browser):
+def select_in_out_cable(browser, tipo_cable = 'interno', pt_fin_cable = None):
     wait = WebDriverWait(browser, 10)
     browser.find_element_by_xpath(
         '/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[1]/td[1]/input').click()
@@ -125,6 +125,11 @@ def select_in_out_cable(browser):
     frame2 = browser.find_element_by_xpath('/html/frameset/frame[2]')
     browser.switch_to_frame(frame)
     time.sleep(2)
+    if tipo_cable == 'externo':
+        browser.find_element_by_xpath('/html/body/div[1]/div/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[1]/td[2]/a').click()
+        time.sleep(2)
+        browser.find_element_by_xpath('/html/body/div[1]/div/table/tbody/tr[3]/td/table/tbody/tr/td/div[2]/table/tbody/tr/td[2]/a').click()
+        time.sleep(2)
     i = 1
     while True:
         b = browser.find_element_by_xpath(
@@ -158,6 +163,12 @@ def select_in_out_cable(browser):
     frame2 = browser.find_element_by_xpath('/html/frameset/frame[2]')
     browser.switch_to_frame(frame)
     time.sleep(2)
+    if tipo_cable == 'externo':
+        pt_fin = browser.find_element_by_xpath("//*[contains(text(), '" + pt_fin_cable + "')]")
+        pt_fin.click()
+        time.sleep(2)
+        browser.find_element_by_xpath('/html/body/div[1]/div/table/tbody/tr[3]/td/table/tbody/tr/td/div[2]/table/tbody/tr/td[2]/a').click()
+        time.sleep(2)
     i = 1
     while True:
         b = browser.find_element_by_xpath(
@@ -997,9 +1008,9 @@ def crear_cables(browser, imbs, inmueble, pbs, btis, cables, pa_chambre):
     browser.find_element_by_xpath('/html/body/div[1]/div[1]/table/tbody/tr[3]/td/table/tbody/tr/td/div[2]/table/tbody/tr/td[2]/a').click()
     time.sleep(2)
     # TODO eliminar inicialización de pts de pbs en produccion
-    pbs['a']['pt'] = '005433'
-    pbs['b']['pt'] = '005430'
-    btis['1']['pt'] = '005434'
+    pbs['a']['pt'] = '005434'
+    pbs['b']['pt'] = '005444'
+    btis['1']['pt'] = '005445'
     # for cable in cables:
     #     if 'bti' in cables[cable]['ini']:  # si el cable va de bti a pb es interno
     #         time.sleep(3)
@@ -1263,7 +1274,7 @@ def crear_cables(browser, imbs, inmueble, pbs, btis, cables, pa_chambre):
         time.sleep(2)
         browser.find_element_by_xpath('/html/body/div[1]/div[1]/table/tbody/tr[3]/td/table/tbody/tr/td/div[2]/table/tbody/tr/td[2]/a').click()
         if 'PA' in cables[cable]['ini']:  # si el cable es externo
-            time.sleep(1)
+            # time.sleep(1)
             browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/table/tbody/tr/td[4]/a').click()
             time.sleep(1)
             num_fo_form = browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[3]/td[2]/input')
@@ -1299,21 +1310,23 @@ def crear_cables(browser, imbs, inmueble, pbs, btis, cables, pa_chambre):
                 if cables[cable]['fin'] == pb:
                     if pbs[pb]['inmueble'] == inmueble:
                         select_imb_con_pt(browser, inmueble, frame2)
+                        pt_fin_cable = pbs[pb]['pt']
             for bti in btis:
                 fin = cables[cable]['fin']
                 if fin[-1] == bti:
                     if btis[bti]['imb_is'] == inmueble:
                         select_imb_con_pt(browser, inmueble, frame2)
+                        pt_fin_cable = btis[bti]['pt']
             wait.until(EC.number_of_windows_to_be(1))
             browser.switch_to_window(main_window)
             time.sleep(2)
             # Crear cable
             browser.find_element_by_xpath('/html/body/div/div[1]/div/form/table/tbody/tr/td/table/tbody/tr[15]/td/a[1]').click()
             time.sleep(2)
-            # Pulsar el cable
-            browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/div[1]/table/tbody/tr/td[2]/a').click()
+            # Pulsar el cable  TODO esta linea sobra en produccion
+            # browser.find_element_by_xpath('/html/body/div[1]/div[1]/div/form/table/tbody/tr/td/div[1]/table/tbody/tr[8]/td[2]/a').click()
             time.sleep(3)
-            select_in_out_cable(browser)
+            select_in_out_cable(browser, 'externo', pt_fin_cable)
 
             # Click en parametros para OSP inventaire
             browser.find_element_by_xpath('/html/body/div[1]/div[1]/table/tbody/tr[3]/td/table/tbody/tr/td/div[4]/table/tbody/tr/td[2]/a').click()
