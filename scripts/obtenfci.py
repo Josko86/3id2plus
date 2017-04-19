@@ -115,8 +115,7 @@ def cargar_datos_excel(client):
         if os.name == 'nt':
             # doc = openpyxl.load_workbook('SuiviJRU.xlsm', data_only=True)
             if client == 'SC1':
-                doc = openpyxl.load_workbook(r'Z:/03-PRODUCCION/0.CAFT/SC1/PRODUCCIÓN/Tab Suivi Prod/SC1 TSP 2017.xlsm',
-                                             data_only=True)
+                doc = openpyxl.load_workbook(r'X:/TSP/SC1 TSP 2017.xlsm', data_only=True)
             elif client == 'SC00':
                 doc = openpyxl.load_workbook(
                     r'Z:/03-PRODUCCION/0.CAFT/SC00/PRODUCCIÓN/Tab Suivi Prod/SC00 TSP 2017.xlsm',
@@ -679,6 +678,34 @@ def mover_ficheros(d, client, dep=1):
         print('El directorio origen no existe')
 
 
+def zip_folder(folder_path, output_path):
+    """Zip the contents of an entire folder (with that folder included
+    in the archive). Empty subfolders will be included in the archive
+    as well.
+    """
+    # parent_folder = os.path.dirname(folder_path)
+    # Retrieve the paths of the folder contents.
+    contents = os.walk(folder_path)
+    try:
+        zip_file = zipfile.ZipFile(output_path, 'w', zipfile.ZIP_DEFLATED)
+        for root, folders, files in contents:
+            # Include all subfolders, including empty ones.
+            for folder_name in folders:
+                absolute_path = os.path.join(root, folder_name)
+                relative_path = absolute_path.replace(folder_path + '\\',
+                                                      '')
+                zip_file.write(absolute_path, relative_path)
+            for file_name in files:
+                if '.zip' not in file_name:
+                    absolute_path = os.path.join(root, file_name)
+                    relative_path = absolute_path.replace(folder_path + '\\',
+                                                          '')
+                    zip_file.write(absolute_path, relative_path)
+
+    finally:
+        zip_file.close()
+
+
 def zip_ficheros(d, fci, client, dep=1):
     # Crea un zip del dxf y el c3a, y las carpetas FOA si hubiera
     global destino, folder_rf
@@ -697,20 +724,20 @@ def zip_ficheros(d, fci, client, dep=1):
     if dep == 2:
         for e in os.listdir(dosier_folder):
             if 'TFX_V' in e:
-                destino = dosier_folder + e + os.sep
+                destino = dosier_folder + e
                 folder_rf = e
     else:
         for e in os.listdir(dosier_folder):
             if '_V' in e and 'RF' in e:
-                destino = dosier_folder + e + os.sep
+                destino = dosier_folder + e
                 folder_rf = e
 
-    # ZIP DEFLATED para hacer que se comprima, no solo que se guarde en un archivo .zip
-    zf = zipfile.ZipFile(destino + folder_rf + '.zip', mode='w', compression=zipfile.ZIP_DEFLATED)
-    for e in os.listdir(destino):
-        if e != folder_rf + '.zip' and 'xxxxxxxx' not in e:
-            zf.write(destino + e, basename(destino + e))
-    zf.close()
+    zip_folder(destino, destino + os.sep + folder_rf + '.zip')
+    # zf = zipfile.ZipFile(destino + folder_rf + '.zip', mode='w', compression=zipfile.ZIP_DEFLATED)
+    # for e in os.listdir(destino):
+    #     if e != folder_rf + '.zip' and 'xxxxxxxx' not in e:
+    #         zf.write(destino + e, basename(destino + e))
+    # zf.close()
 
 
 def depositar_webop(d, fci, browser, client, dep=1):
@@ -836,6 +863,8 @@ def obtener_fci(client):
     #               'ref_cli': 'SC6_TLS_AVALPMRCEM_FI_31555_0111', 'ref_1era_PM': 'A DEPOSER', 'ciudad': 'TOULOUSE',
     #               'tipo': 'CPL', 'IPE_PM': 'FI-31555-0111', 'calles': ['ROUTE DE LAUNAGUET', 'RUE PAGES'], 'row': 55,
     #               'num_EL': '300', 'date_ini': '11/04/2017', 'es_1ca': True}}
+    # zip_folder(r'C:\Users\josko\PycharmProjects\josko\scripts\TFX_V1',
+    #            r'C:\Users\josko\PycharmProjects\josko\scripts\TFX_V1\TFX_V1.zip')
 
     result = {}
     try:
@@ -851,7 +880,7 @@ def obtener_fci(client):
     excel.EnableEvents = False
     if os.name == 'nt':
         if client == 'SC1':
-            wb = excel.Workbooks.Open(r'Z:/03-PRODUCCION/0.CAFT/SC1/PRODUCCIÓN/Tab Suivi Prod/SC1 TSP 2017.xlsm')
+            wb = excel.Workbooks.Open(r'X:/TSP/SC1 TSP 2017.xlsm')
         elif client == 'SC00':
             wb = excel.Workbooks.Open(r'Z:/03-PRODUCCION/0.CAFT/SC00/PRODUCCIÓN/Tab Suivi Prod/SC00 TSP 2017.xlsm')
         elif client == 'SC6':
@@ -947,7 +976,7 @@ def depositar2(client):
     excel = win32.gencache.EnsureDispatch('Excel.Application')
     excel.EnableEvents = False
     if client == 'SC1':
-        wb = excel.Workbooks.Open(r'Z:/03-PRODUCCION/0.CAFT/SC1/PRODUCCIÓN/Tab Suivi Prod/SC1 TSP 2017.xlsm')
+        wb = excel.Workbooks.Open(r'X:/TSP/SC1 TSP 2017.xlsm')
     elif client == 'SC00':
         wb = excel.Workbooks.Open(r'Z:/03-PRODUCCION/0.CAFT/SC00/PRODUCCIÓN/Tab Suivi Prod/SC00 TSP 2017.xlsm')
     elif client == 'SC6':
